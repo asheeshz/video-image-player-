@@ -1,1 +1,335 @@
-(function(){"use strict";const e={playerVideos:[],currentVideoIndex:0,autoOpenTimer:null,isAutoOpenCancelled:!1,COUNTDOWN_SECONDS:5,init:function(){const e=document.getElementById("agp-auto-open-btn");e&&(this.parseData(),0!==this.playerVideos.length&&(e.addEventListener("click",()=>{this.isAutoOpenCancelled?this.openPlayer():(this.cancelAutoOpen(),this.openPlayer())}),e.addEventListener("dblclick",e=>{e.preventDefault(),this.isAutoOpenCancelled||this.cancelAutoOpen()}),this.startCountdown()))},parseData:function(){const e=document.getElementById("agp-video-data");e&&e.querySelectorAll("div[data-platform]").forEach(e=>{const t=e.dataset.platform,o=e.dataset.embedUrl;e.querySelectorAll("i").forEach(e=>{this.playerVideos.push({platform:t,id:e.dataset.id,title:e.dataset.title,embedUrl:o})})})},startCountdown:function(){if(this.isAutoOpenCancelled)return;const e=document.getElementById("agp-timer-overlay");e&&(e.style.display="flex"),this.autoOpenTimer=setTimeout(()=>{this.isAutoOpenCancelled||this.openPlayer()},1e3*this.COUNTDOWN_SECONDS)},cancelAutoOpen:function(){this.isAutoOpenCancelled=!0,clearTimeout(this.autoOpenTimer);const e=document.getElementById("agp-timer-overlay");e&&(e.style.display="none")},openPlayer:function(e=0){const t=document.getElementById("agp-video-player-modal");if(t&&0!==this.playerVideos.length){this.cancelAutoOpen(),t.style.display="block",document.body.style.overflow="hidden",this.addEventListenersToModal(),this.renderDropdown(),this.loadVideo(e,!0)}else 0===this.playerVideos.length&&alert("कोई वीडियो उपलब्ध नहीं है।")},closePlayer:function(){const e=document.getElementById("agp-video-player-modal");e&&(e.style.display="none");const t=document.getElementById("agp-video-main-area");t&&(t.innerHTML='<button class="agp-video-nav agp-video-prev" onclick="agp_slideVideo(-1)"><i class="fas fa-chevron-left"></i></button><button class="agp-video-nav agp-video-next" onclick="agp_slideVideo(1)"><i class="fas fa-chevron-right"></i></button>'),document.body.style.overflow="auto"},addEventListenersToModal:function(){document.querySelector(".agp-video-menu-btn").onclick=()=>this.toggleDropdown(),document.querySelector(".agp-video-close-btn").onclick=()=>this.closePlayer()},loadVideo:function(e,t=!0){this.currentVideoIndex=e;const o=this.playerVideos[e],n=document.getElementById("agp-video-modal-title");n&&(n.textContent=o.title);const i=document.getElementById("agp-video-main-area"),a=i.querySelector("iframe");a&&a.remove();const l=document.createElement("iframe");l.setAttribute("frameborder","0"),l.setAttribute("allowfullscreen",""),l.setAttribute("allow","autoplay; fullscreen");let s="";s="youtube"===o.platform?`${o.embedUrl}${o.id}?autoplay=${t?1:0}&mute=0&rel=0`:`${o.embedUrl}${o.id}?autoplay=${t?1:0}`,l.src=s,i.prepend(l),this.updateDropdownActive()},renderDropdown:function(){const e=document.getElementById("agp-video-dropdown-menu");e.innerHTML="",this.playerVideos.forEach((t,o)=>{const n=document.createElement("div");n.className="agp-video-dropdown-item",n.textContent=t.title,n.onclick=()=>{this.loadVideo(o,!0),e.classList.remove("open")},e.appendChild(n)})},updateDropdownActive:function(){const e=document.getElementById("agp-video-dropdown-menu");Array.from(e.children).forEach((e,t)=>{e.classList.toggle("active-video-item",t===this.currentVideoIndex)})},toggleDropdown:function(){document.getElementById("agp-video-dropdown-menu").classList.toggle("open")},slide:function(e){const t=(this.currentVideoIndex+e+this.playerVideos.length)%this.playerVideos.length;this.loadVideo(t,!0)}},t={galleryData:[],currentSlideIndex:0,postURLForShare:"",init:function(){const e=document.querySelector(".agp-image-gallery");e&&(this.parseData(),this.galleryData.length>0&&this.displaySlide(0))},parseData:function(){const e=document.getElementById("agp-gallery-config");e&&(this.postURLForShare=e.dataset.postUrl||"");const t=document.getElementById("agp-gallery-items-data");t&&t.querySelectorAll(".item").forEach(e=>{this.galleryData.push({src:e.dataset.src||"",title:e.dataset.title||"",description:e.dataset.description||""})})},displaySlide:function(e){if(!(e<0||e>=this.galleryData.length)){const t=this.galleryData[e],o=document.getElementById("agp-main-image");o.classList.add("fade-out"),setTimeout(()=>{o.src=t.src,o.alt=t.title,o.style.animation="none",o.offsetHeight,o.style.animation=null,o.classList.remove("fade-out");const e=document.getElementById("agp-image-counter");e&&(e.innerText=`${this.currentSlideIndex+1} / ${this.galleryData.length}`)},300),document.getElementById("agp-image-title").innerText=t.title||"",document.getElementById("agp-image-description").innerText=t.description||""}},navigate:function(e){this.currentSlideIndex+=e,this.currentSlideIndex>=this.galleryData.length&&(this.currentSlideIndex=0),this.currentSlideIndex<0&&(this.currentSlideIndex=this.galleryData.length-1),this.displaySlide(this.currentSlideIndex)},share:async function(){const e=this.galleryData[this.currentSlideIndex];if(e&&this.postURLForShare){const t={title:document.title,text:`यह तस्वीर देखें: ${e.title}`,url:this.postURLForShare};try{await navigator.share(t)}catch(e){}}},showDownloadToast:function(){const e=document.getElementById("agp-download-toast");e.className="agp-toast show",setTimeout(()=>{e.className=e.className.replace("show","")},4e3)}};window.agp_slideVideo=t=>e.slide(t),window.agp_navigateImage=e=>t.navigate(e),window.agp_shareImage=()=>t.share(),window.agp_showDownloadToast=()=>t.showDownloadToast(),document.addEventListener("DOMContentLoaded",()=>{e.init(),t.init()}),document.addEventListener("keydown",t=>{const o=document.getElementById("agp-video-player-modal");o&&"block"===o.style.display&&"Escape"===t.key&&e.closePlayer()})})();
+// ==========================================================
+// === विजेट 1: एनिमेटेड इमेज गैलरी
+// === इस कोड को एक IIFE (Immediately Invoked Function Expression) में लपेटा गया है
+// === ताकि इसके वेरिएबल्स और फंक्शन्स दूसरे स्क्रिप्ट से न टकराएं।
+// ==========================================================
+(function() {
+    // === यह सेक्शन HTML से डेटा पढ़ता है। qqq- प्रीफिक्स जोड़ा गया है। ===
+    let postURLForShare = "";
+    let galleryData = [];
+    let currentSlideIndex = 0;
+
+    function parseDataFromHTML() {
+        const configDiv = document.getElementById('qqq-gallery-config');
+        if (configDiv) {
+            postURLForShare = configDiv.dataset.postUrl || "";
+        }
+
+        const itemsContainer = document.getElementById('qqq-gallery-items-data');
+        if (itemsContainer) {
+            const itemDivs = itemsContainer.querySelectorAll('.qqq-item');
+            itemDivs.forEach(div => {
+                galleryData.push({
+                    mainSrc: div.dataset.src || "",
+                    title: div.dataset.title || "",
+                    description: div.dataset.description || ""
+                });
+            });
+        }
+    }
+
+    // === नीचे का कोड पहले जैसा ही है, केवल आईडी और क्लास को अपडेट किया गया है ===
+    function initializeAnimatedGallery() {
+        if (galleryData.length > 0) {
+            displaySlide(0);
+        }
+    }
+
+    function displaySlide(index) {
+        if (index < 0 || index >= galleryData.length) return;
+        currentSlideIndex = index; // currentSlideIndex को यहाँ अपडेट करना महत्वपूर्ण है
+        const item = galleryData[index];
+        const mainImage = document.getElementById("qqq-main-gallery-image-animated");
+        if (!mainImage) return;
+
+        mainImage.classList.add('qqq-fade-out');
+
+        setTimeout(() => {
+            mainImage.src = item.mainSrc;
+            mainImage.alt = item.title;
+            mainImage.classList.remove('qqq-fade-out');
+            mainImage.style.animation = 'none';
+            void mainImage.offsetHeight; // रिफ्लो ट्रिगर करें
+            mainImage.style.animation = null;
+
+            const counterElement = document.getElementById("qqq-image-counter-animated");
+            if (counterElement) {
+                counterElement.innerText = `${currentSlideIndex + 1} / ${galleryData.length}`;
+            }
+        }, 300);
+
+        const titleEl = document.getElementById("qqq-image-title-animated");
+        if(titleEl) titleEl.innerText = item.title || "";
+        
+        const descriptionEl = document.getElementById("qqq-image-description-animated");
+        if(descriptionEl) descriptionEl.innerText = item.description || "";
+    }
+
+    function navigate(n) {
+        let newIndex = currentSlideIndex + n;
+        if (newIndex >= galleryData.length) {
+            newIndex = 0;
+        }
+        if (newIndex < 0) {
+            newIndex = galleryData.length - 1;
+        }
+        displaySlide(newIndex);
+    }
+
+    async function shareCurrentImage() {
+        const currentItem = galleryData[currentSlideIndex];
+        if (!currentItem || !postURLForShare) return;
+        const shareData = {
+            title: document.title,
+            text: `मेरे ब्लॉग से यह तस्वीर देखें: ${currentItem.title}`,
+            url: postURLForShare
+        };
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.error("शेयर नहीं किया जा सका:", err);
+            }
+        } else {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareData.text)} - ${encodeURIComponent(shareData.url)}`, "_blank");
+        }
+    }
+
+    function showDownloadMessage() {
+        const toast = document.getElementById("qqq-download-toast-animated");
+        if (!toast) return;
+        toast.className = "qqq-toast-animated show";
+        setTimeout(() => {
+            toast.className = toast.className.replace("show", "");
+        }, 4000);
+    }
+
+    // पेज लोड होते ही डेटा पार्स करें और फिर गैलरी शुरू करें
+    document.addEventListener('DOMContentLoaded', () => {
+        parseDataFromHTML();
+        initializeAnimatedGallery();
+        
+        // नेविगेशन और अन्य बटनों के लिए इवेंट लिस्टनर यहाँ जोड़ें
+        // यह सुनिश्चित करेगा कि वे केवल इस विजेट के लिए काम करें
+        const prevButton = document.querySelector('.qqq-prev-animated');
+        if(prevButton) prevButton.addEventListener('click', () => navigate(-1));
+
+        const nextButton = document.querySelector('.qqq-next-animated');
+        if(nextButton) nextButton.addEventListener('click', () => navigate(1));
+
+        const shareButton = document.getElementById('qqq-share-btn-animated');
+        if(shareButton) shareButton.addEventListener('click', shareCurrentImage);
+        
+        const downloadButton = document.getElementById('qqq-download-btn-animated');
+        if(downloadButton) downloadButton.addEventListener('click', showDownloadMessage);
+    });
+})(); // इमेज गैलरी IIFE यहाँ समाप्त होता है
+
+
+// ==========================================================
+// === विजेट 2: वीडियो प्लेयर
+// === यह कोड पहले से ही एक सुरक्षित IIFE में था, इसलिए इसमें कोई बदलाव की जरूरत नहीं है।
+// ==========================================================
+(function() {
+    let playerVideos = [];
+    let currentVideoIndex = 0;
+    let messages = {};
+    const videoPlayerModalEl = document.getElementById("player3_videoPlayerModal");
+    const videoPlayerMainAreaEl = document.getElementById("player3_videoPlayerMainArea");
+    const videoModalTitleEl = document.getElementById("player3_videoModalTitle");
+    const videoDropdownMenuEl = document.getElementById("videoDropdownMenu");
+    let autoOpenTimer = null;
+    let isAutoOpenCancelled = false;
+    const COUNTDOWN_SECONDS = 5;
+
+    function getMessage(key) {
+        return messages[key] || `[${key}]`;
+    }
+
+    function parseData() {
+        const dataContainer = document.getElementById('player3_data');
+        if (!dataContainer) return;
+        const msgContainer = dataContainer.querySelector('#player3_messages');
+        if (msgContainer) {
+            msgContainer.querySelectorAll('span').forEach(span => {
+                messages[span.dataset.msg] = span.textContent;
+            });
+        }
+        dataContainer.querySelectorAll('div[data-platform]').forEach(platformDiv => {
+            const platform = platformDiv.dataset.platform;
+            const embedUrl = platformDiv.dataset.embedUrl;
+            platformDiv.querySelectorAll('i').forEach(videoEl => {
+                playerVideos.push({
+                    platform: platform,
+                    id: videoEl.dataset.id,
+                    title: videoEl.dataset.title || 'Untitled Video',
+                    embedUrl: embedUrl
+                });
+            });
+        });
+    }
+
+    function renderVideoDropdownMenu() {
+        if (!videoDropdownMenuEl) return;
+        videoDropdownMenuEl.innerHTML = '';
+        if (playerVideos.length === 0) return;
+        playerVideos.forEach((video, index) => {
+            const listItem = document.createElement('div');
+            listItem.className = 'video-dropdown-item';
+            listItem.textContent = video.title;
+            listItem.title = video.title;
+            listItem.onclick = () => {
+                loadVideoInModal(index, true);
+                videoDropdownMenuEl.classList.remove('open');
+            };
+            videoDropdownMenuEl.appendChild(listItem);
+        });
+    }
+
+    function loadVideoInModal(index, autoplay = true) {
+        currentVideoIndex = index;
+        const video = playerVideos[index];
+        if (!video || !videoPlayerMainAreaEl) return;
+        if (videoModalTitleEl) videoModalTitleEl.textContent = video.title;
+        if (videoDropdownMenuEl) {
+            Array.from(videoDropdownMenuEl.children).forEach((item, idx) => {
+                item.classList.toggle('active-video-item', idx === index);
+            });
+        }
+        const existingVideo = videoPlayerMainAreaEl.querySelector('iframe, video, .player-message');
+        if (existingVideo) existingVideo.remove();
+        let newElement;
+        const allowPolicy = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+        const autoplayParam = autoplay ? 1 : 0;
+        switch (video.platform) {
+            case 'youtube':
+                newElement = document.createElement('iframe');
+                newElement.src = `${video.embedUrl}${video.id}?autoplay=${autoplayParam}&mute=0&rel=0&modestbranding=1&iv_load_policy=3`;
+                newElement.setAttribute('allow', allowPolicy);
+                break;
+            case 'archive':
+                newElement = document.createElement('iframe');
+                newElement.src = `${video.embedUrl}${video.id}&autoplay=${autoplayParam}`;
+                newElement.setAttribute('allow', allowPolicy);
+                break;
+            case 'dailymotion':
+                newElement = document.createElement('iframe');
+                newElement.src = `${video.embedUrl}${video.id}?autoplay=${autoplayParam}&mute=0`;
+                newElement.setAttribute('allow', allowPolicy);
+                break;
+            default:
+                newElement = document.createElement('div');
+                newElement.className = 'player-message';
+                newElement.style.cssText = 'color: #ff8a80; display: flex; align-items: center; justify-content: center; height: 100%;';
+                newElement.textContent = getMessage('unsupported_video');
+                break;
+        }
+        if (newElement.tagName === 'IFRAME') {
+            newElement.setAttribute('frameborder', '0');
+            newElement.setAttribute('allowfullscreen', '');
+        }
+        videoPlayerMainAreaEl.prepend(newElement);
+    }
+    
+    window.player3_slideVideoInModal = (direction) => {
+        if (playerVideos.length === 0) return;
+        const newIndex = (currentVideoIndex + direction + playerVideos.length) % playerVideos.length;
+        loadVideoInModal(newIndex, true);
+    }
+    window.player3_toggleVideoDropdown = () => {
+        if (videoDropdownMenuEl) {
+            videoDropdownMenuEl.classList.toggle('open');
+        }
+    }
+    window.player3_openVideoPlayerModal = (startIndex = 0) => {
+        if (!videoPlayerModalEl) return;
+        if (playerVideos.length === 0) {
+            clearTimeout(autoOpenTimer);
+            hideTimerOverlay();
+            alert(getMessage('no_videos'));
+            return;
+        }
+        videoPlayerModalEl.style.display = "block";
+        document.body.style.overflow = 'hidden';
+        renderVideoDropdownMenu();
+        loadVideoInModal(startIndex, true);
+    }
+    window.player3_closeVideoPlayerModal = () => {
+        if (videoPlayerModalEl) videoPlayerModalEl.style.display = "none";
+        const existingVideo = videoPlayerMainAreaEl.querySelector('iframe, video, .player-message');
+        if (existingVideo) existingVideo.remove();
+        document.body.style.overflow = 'auto';
+        if (videoDropdownMenuEl) videoDropdownMenuEl.classList.remove('open');
+    }
+    
+    document.addEventListener("keydown", function(e) {
+        if (videoPlayerModalEl && videoPlayerModalEl.style.display === "block") {
+            if (e.key === "Escape") window.player3_closeVideoPlayerModal();
+            if (e.key === "ArrowRight") {
+                e.preventDefault();
+                window.player3_slideVideoInModal(1);
+            }
+            if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                window.player3_slideVideoInModal(-1);
+            }
+        }
+    });
+    
+    document.addEventListener('click', function(event) {
+        const menuBtn = document.querySelector('.ati-video-player-menu-btn');
+        if (videoDropdownMenuEl && videoDropdownMenuEl.classList.contains('open')) {
+            if (!videoDropdownMenuEl.contains(event.target) && (!menuBtn || !menuBtn.contains(event.target))) {
+                videoDropdownMenuEl.classList.remove('open');
+            }
+        }
+    });
+
+    const timerOverlayEl = document.getElementById('ati-timer-overlay-id');
+
+    function hideTimerOverlay() {
+        if (timerOverlayEl) {
+            timerOverlayEl.style.display = 'none';
+        }
+    }
+
+    function cancelAutoOpen() {
+        isAutoOpenCancelled = true;
+        clearTimeout(autoOpenTimer);
+        hideTimerOverlay();
+    }
+
+    function startAutoOpenCountdown() {
+        if (isAutoOpenCancelled || playerVideos.length === 0) return;
+        if (timerOverlayEl) timerOverlayEl.style.display = 'flex';
+        autoOpenTimer = setTimeout(() => {
+            if (!isAutoOpenCancelled) {
+                hideTimerOverlay();
+                window.player3_openVideoPlayerModal();
+            }
+        }, COUNTDOWN_SECONDS * 1000);
+    }
+
+    function initializeAutoOpenFeature() {
+        const autoOpenBtn = document.getElementById('ati-auto-open-btn');
+        if (!autoOpenBtn) return;
+        autoOpenBtn.addEventListener('click', function() {
+            if (isAutoOpenCancelled) {
+                window.player3_openVideoPlayerModal();
+            } else {
+                cancelAutoOpen();
+                window.player3_openVideoPlayerModal();
+            }
+        });
+        autoOpenBtn.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            if (!isAutoOpenCancelled) {
+                cancelAutoOpen();
+            }
+        });
+        startAutoOpenCountdown();
+    }
+    
+    parseData();
+    document.addEventListener('DOMContentLoaded', initializeAutoOpenFeature);
+})(); // वीडियो प्लेयर IIFE यहाँ समाप्त होता है
