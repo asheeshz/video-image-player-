@@ -1,5 +1,5 @@
 /* ====================================================== */
-/* STYLES (CSS) - ati-styles.css                          */
+/* STYLES (CSS) - ati Player */
 /* ====================================================== */
 @keyframes pulseGlow {
     0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35); }
@@ -85,10 +85,11 @@
     background-position: center;
 }
 
-/* === बदलाव: आइकॉन के लिए ग्रेडिएंट स्टाइल === */
-.ati-button .fa-photo,
+/* === आइकॉन के लिए ग्रेडिएंट स्टाइल (Font Awesome 6 के लिए अपडेट किया गया) === */
+.ati-button .fa-image,
 #ati-auto-open-btn::before {
-    font-family: FontAwesome; /* प्ले आइकॉन के लिए ज़रूरी */
+    font-family: 'Font Awesome 6 Free'; /* Font Awesome 6 के लिए */
+    font-weight: 900; /* सॉलिड आइकॉन के लिए आवश्यक */
     content: '\f04b'; /* प्ले आइकॉन का करैक्टर */
     font-size: 3.5em;
     margin-bottom: 10px;
@@ -101,16 +102,16 @@
     transition: all 0.3s ease;
 }
 /* फोटो आइकॉन का करैक्टर ओवरराइड */
-.ati-button .fa-photo::before {
-    content: '\f03e'; /* Font Awesome Photo Icon */
+.ati-button .fa-image::before {
+    content: '\f03e'; /* Font Awesome Photo/Image Icon */
 }
 /* वीडियो आइकॉन के लिए content को खाली करें ताकि pseudo-element वाला दिखे */
 #ati-auto-open-btn::before {
-    content: '\f04b';
+    content: '\f04b'; /* प्ले आइकॉन */
 }
 
 /* होवर पर आइकॉन का स्केल */
-.ati-action-box:hover .ati-button .fa-photo,
+.ati-action-box:hover .ati-button .fa-image,
 .ati-action-box:hover #ati-auto-open-btn::before {
     transform: scale(1.1);
 }
@@ -131,7 +132,7 @@
 /* === अतिरिक्त नेविगेशन बटन === */
 .additional-nav-buttons{ margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
 .ati-nav-link-button { display: inline-flex; align-items: center; padding: 8px 18px; background: #2c3e50; color: #FFD700; border: 2px solid #FFD700; border-radius: 8px; text-decoration: none; font-family: 'Teko', sans-serif; font-size: 1.2em; letter-spacing: 1px; text-transform: uppercase; transition: all 0.25s ease; box-shadow: 0 2px 5px rgba(0,0,0,.4); }
-.ati-nav-link-button .fa { margin-right: 8px; font-size: 1.1em; }
+.ati-nav-link-button .fa-solid { margin-right: 8px; font-size: 1.1em; }
 .ati-nav-link-button:hover { background: #FFD700; color: #2c3e50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); }
 
 /* --- Video Player Modal --- */
