@@ -1,78 +1,4 @@
 /* ================================================================== */
-/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) */
-/* ================================================================== */
-(function() {
-    let postURLForShare = "";
-    let galleryData = [];
-    let currentSlideIndex = 0;
-    function parseDataFromHTML() {
-        const configDiv = document.getElementById('qqq-gallery-config');
-        if (configDiv) { postURLForShare = configDiv.dataset.postUrl || ""; }
-        const itemsContainer = document.getElementById('qqq-gallery-items-data');
-        if (itemsContainer) {
-            const itemDivs = itemsContainer.querySelectorAll('.qqq-item');
-            itemDivs.forEach(div => {
-                galleryData.push({ mainSrc: div.dataset.src || "", title: div.dataset.title || "", description: div.dataset.description || "" });
-            });
-        }
-    }
-    function initializeAnimatedGallery() {
-        if (galleryData.length > 0) { displaySlide(0); }
-    }
-    function displaySlide(index) {
-        if (index < 0 || index >= galleryData.length) return;
-        currentSlideIndex = index;
-        const item = galleryData[index];
-        const mainImage = document.getElementById("qqq-main-gallery-image-animated");
-        mainImage.classList.add('qqq-fade-out');
-        setTimeout(() => {
-            mainImage.src = item.mainSrc;
-            mainImage.alt = item.title;
-            mainImage.classList.remove('qqq-fade-out');
-            mainImage.style.animation = 'none';
-            mainImage.offsetHeight;
-            mainImage.style.animation = null;
-            const counterElement = document.getElementById("qqq-image-counter-animated");
-            if (counterElement) { counterElement.innerText = `${currentSlideIndex + 1} / ${galleryData.length}`; }
-        }, 300);
-        document.getElementById("qqq-image-title-animated").innerText = item.title || "";
-        document.getElementById("qqq-image-description-animated").innerText = item.description || "";
-    }
-    function navigate(n) {
-        let newIndex = currentSlideIndex + n;
-        if (newIndex >= galleryData.length) { newIndex = 0; }
-        if (newIndex < 0) { newIndex = galleryData.length - 1; }
-        displaySlide(newIndex);
-    }
-    async function shareCurrentImage() {
-        const currentItem = galleryData[currentSlideIndex];
-        if (!currentItem || !postURLForShare) return;
-        const shareData = { title: document.title, text: `मेरे ब्लॉग से यह तस्वीर देखें: ${currentItem.title}`, url: postURLForShare };
-        if (navigator.share) {
-            try { await navigator.share(shareData); } catch (err) {}
-        } else { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareData.text)} - ${encodeURIComponent(shareData.url)}`, "_blank"); }
-    }
-    function showDownloadMessage() {
-        const toast = document.getElementById("qqq-download-toast-animated");
-        if (!toast) return;
-        toast.className = "qqq-toast-animated show";
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 4000);
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-        parseDataFromHTML();
-        initializeAnimatedGallery();
-        const prevArrow = document.querySelector('.qqq-main-arrow-animated.qqq-prev');
-        const nextArrow = document.querySelector('.qqq-main-arrow-animated.qqq-next');
-        const shareBtn = document.querySelector('.qqq-share-btn-animated');
-        const downloadBtn = document.querySelector('.qqq-download-btn-animated');
-        if (prevArrow) prevArrow.addEventListener('click', () => navigate(-1));
-        if (nextArrow) nextArrow.addEventListener('click', () => navigate(1));
-        if (shareBtn) shareBtn.addEventListener('click', shareCurrentImage);
-        if (downloadBtn) downloadBtn.addEventListener('click', showDownloadMessage);
-    });
-})();
-
-/* ================================================================== */
 /* SCRIPT FOR WIDGET 2: VIDEO PLAYER (PREFIX: ati_) */
 /* ================================================================== */
 (function() {
@@ -218,25 +144,31 @@
         ati_parseData();
         const autoOpenBtn = document.getElementById('ati_auto_open_btn');
         if (!autoOpenBtn) return;
-
-        // === समस्या का समाधान: सुधारा हुआ क्लिक और डबल-क्लिक लॉजिक ===
+        
+        // समाधान: टाइमर ओवरले पर भी डबल-क्लिक जोड़ा गया
+        const timerOverlay = document.getElementById('ati_timer_overlay_id');
+        if (timerOverlay) {
+            timerOverlay.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // इवेंट को बटन तक जाने से रोकता है
+                ati_cancelAutoOpen();
+            });
+        }
+        
+        // 'वीडियो प्लेयर देखें' बटन पर क्लिक और डबल-क्लिक का प्रबंधन
         autoOpenBtn.addEventListener('click', function() {
-            // पिछले क्लिक के टाइमआउट को साफ़ करें (यदि कोई हो)
             clearTimeout(ati_click_timeout);
-            
-            // एक नया टाइमआउट सेट करें। अगर 250ms में डबल-क्लिक नहीं होता है, तो यह चलेगा।
             ati_click_timeout = setTimeout(function() {
+                // अगर 250ms में डबल-क्लिक नहीं होता है, तो प्लेयर खोलें
                 window.ati_openVideoPlayerModal();
             }, 250);
         });
 
         autoOpenBtn.addEventListener('dblclick', function(e) {
-            e.preventDefault(); // ब्राउज़र के डिफ़ॉल्ट डबल-क्लिक व्यवहार को रोकें
-            
-            // सिंगल-क्लिक के लिए सेट किए गए टाइमआउट को रद्द करें ताकि प्लेयर न खुले
+            e.preventDefault();
+            // सिंगल-क्लिक का टाइमआउट रद्द करें
             clearTimeout(ati_click_timeout);
-            
-            // अब, केवल ऑटो-प्ले को रद्द करने का काम करें
+            // ऑटो-ओपन को रद्द करें
             ati_cancelAutoOpen();
         });
         
