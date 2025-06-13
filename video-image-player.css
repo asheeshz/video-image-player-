@@ -1,33 +1,43 @@
 /* ================================================================== */
-/* CSS FOR WIDGET 1: IMAGE PLAYER (PREFIX: qqq-) - (REVISED)          */
+/* CSS FOR WIDGET 1: IMAGE PLAYER (PREFIX: qqq-)                      */
 /* ================================================================== */
 
-/* --- नई हेल्पर क्लास जो दोनों कंटेनरों को एक समान बनाती है --- */
+/* --- विजेट के सामान्य स्टाइल --- */
+.qqq-widget-wrapper {
+    background: #111;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #444;
+}
+
+.qqq-widget-title {
+    text-align: center;
+    font-family: 'Teko', sans-serif;
+    color: #FFD700;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.qqq-widget-separator {
+    border: none;
+    border-top: 1px solid #444;
+    margin: 30px auto;
+}
+
 .qqq-unified-container {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    /* दोनों के बीच थोड़ी जगह के लिए मार्जिन */
-    margin-bottom: 20px; 
+    margin-bottom: 20px;
 }
 
-/* ... बाकी विजेट स्टाइल ... */
-.qqq-widget-wrapper { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #444; }
-.qqq-widget-title { text-align: center; font-family: 'Teko', sans-serif; color: #FFD700; font-size: 2em; margin-bottom: 20px; }
-.qqq-widget-separator { border: none; border-top: 1px solid #444; margin: 30px auto; }
+/* --- विजेट के मौजूदा स्टाइल्स --- */
+.qqq-atithi-action-container {}
 
-/* सुधारा गया: display: flex हटा दिया गया क्योंकि अब यह एक ब्लॉक कंटेनर है */
-.qqq-atithi-action-container {
-    /* अब यह क्लास खाली हो सकती है या स्पेसिफिक स्टाइल रख सकती है */
-    /* display, gap, justify-content, flex-wrap हटा दिए गए हैं */
-}
-
-/* सुधारा गया: max-width हटा दिया गया ताकि यह पूरी चौड़ाई ले सके */
 .qqq-atithi-action-box {
     position: relative;
     width: 100%;
-    /* max-width: 280px;  <-- यह लाइन हटा दी गई है */
-    aspect-ratio: 16 / 9; /* padding-top की जगह आधुनिक तरीका */
+    aspect-ratio: 16 / 9;
     background: #222;
     border: 2px solid #FFD700;
     border-radius: 12px;
@@ -41,18 +51,7 @@
 .qqq-atithi-action-box:hover .qqq-atithi-button{transform:scale(1.1)}
 .qqq-atithi-button.qqq-video-btn-bg{background-image:linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuEYGxHCbzt5JJYMYXRr12kObH0q3T99pLva8nKtUEOeX9kTPfWzbuVUlzFKMYyZyK0fnhLwfG4PIt8vyISWo8bDUJ3jQPl0JIHeibd8juhkj3wg9BE3_B8z1xxx4uMjPoGZ4zt7pMK6Vk41ZpJ83pLlWOY7ijOvbCUXB1JjcdAR4i8a3pBzu0YmdS47qt/s540/image_search_1749711402902.gif')}
 .qqq-atithi-button .fa-solid{font-size:3.5em;margin-bottom:10px;line-height:1;text-shadow:2px 2px 8px rgba(0,0,0,.7)}
-
-/* सुधारा गया: max-width और margin हटा दिए गए क्योंकि यह अब .qqq-unified-container से आएगा */
-.qqq-gallery-container-animated{
-    font-family:'Lato',sans-serif;
-    background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    padding:15px;
-    border-radius:15px;
-    border:2px solid #D4AF37;
-    box-shadow:0 10px 40px rgba(0,0,0,.2);
-}
-
-/* ... बाकी CSS अपरिवर्तित रहेगा ... */
+.qqq-gallery-container-animated{font-family:'Lato',sans-serif;background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);padding:15px;border-radius:15px;border:2px solid #D4AF37;box-shadow:0 10px 40px rgba(0,0,0,.2)}
 .qqq-main-image-viewer-animated{position:relative;width:100%;background:radial-gradient(circle, rgba(46,55,77,1) 0%, rgba(20,29,50,1) 100%);border-radius:12px;overflow:hidden;margin-bottom:15px;min-height:250px;border-bottom:3px solid #D4AF37}
 #qqq-main-gallery-image-animated{width:100%;height:auto;display:block;animation:qqq-zoomFadeIn .8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both}
 @keyframes qqq-zoomFadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
@@ -71,10 +70,45 @@
 .qqq-image-counter-animated{color:#e0e0e0;font-size:12px;font-weight:700;background-color:rgba(0,0,0,.4);padding:4px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .qqq-toast-animated{visibility:hidden;background-color:#333;color:#fff;text-align:center;border-radius:8px;padding:16px;position:fixed;z-index:1000;left:50%;bottom:30px;transform:translateX(-50%);font-size:14px;opacity:0;transition:all .5s;box-shadow:0 5px 15px rgba(0,0,0,.3)}
 .qqq-toast-animated.show{visibility:visible;opacity:1}
+
+/* ============================================================== */
+/* === नीचे के नेविगेशन बटनों के लिए सुधारा हुआ और आकर्षक स्टाइल === */
+/* ============================================================== */
 .qqq-additional-nav-buttons{margin-top:25px;display:flex;justify-content:center;gap:15px;flex-wrap:wrap}
-.qqq-atithi-nav-link-button{display:inline-flex;align-items:center;padding:8px 18px;background:#2c3e50;color:#FFD700;border:2px solid #FFD700;border-radius:8px;text-decoration:none;font-family:'Teko',sans-serif;font-size:1.2em;letter-spacing:1px;text-transform:uppercase;transition:all .25s ease;box-shadow:0 2px 5px rgba(0,0,0,.4)}
-.qqq-atithi-nav-link-button .fa-solid{margin-right:8px;font-size:1.1em}
-.qqq-atithi-nav-link-button:hover{background:#FFD700;color:#2c3e50;transform:translateY(-2px);box-shadow:0 4px 10px rgba(255,215,0,.4)}
+
+.qqq-atithi-nav-link-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 22px;
+    background: linear-gradient(145deg, #1e293b, #2c3e50); /* गहरा, स्टाइलिश ग्रेडिएंट */
+    color: #FFD700 !important; /* !important यह सुनिश्चित करेगा कि डिफ़ॉल्ट नीला रंग ओवरराइड हो जाए */
+    border: 2px solid #D4AF37; /* थोड़ा गहरा सुनहरा बॉर्डर */
+    border-radius: 10px;
+    text-decoration: none;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2em;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    transition: all .3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 2px 3px rgba(0,0,0,0.3); /* 3D प्रभाव के लिए */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); /* टेक्स्ट को पॉप बनाने के लिए */
+}
+
+.qqq-atithi-nav-link-button .fa-solid {
+    margin-right: 10px;
+    font-size: 1.1em;
+    text-shadow: none; /* आइकन पर डबल शैडो से बचें */
+}
+
+.qqq-atithi-nav-link-button:hover {
+    background: radial-gradient(circle, #FFD700 0%, #f0c300 100%); /* चमकदार सुनहरा होवर */
+    color: #111 !important; /* बेहतर कंट्रास्ट के लिए गहरा टेक्स्ट */
+    border-color: #FFD700;
+    transform: translateY(-3px) scale(1.05); /* थोड़ा और आकर्षक एनीमेशन */
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5); /* चमकता हुआ शैडो */
+}
+/* ============================================================== */
+
 @media (max-width:768px){#qqq-image-title-animated{font-size:1.3rem}}
 
 /* ================================================================== */
