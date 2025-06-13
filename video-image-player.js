@@ -85,9 +85,11 @@
     const ati_videoDropdownMenuEl = document.getElementById("ati_videoDropdownMenu");
     let ati_autoOpenTimer = null;
     let ati_isAutoOpenCancelled = false;
-    let ati_click_timeout = null;
+    let ati_click_timeout = null; // यह डबल क्लिक का पता लगाने में मदद करेगा
     const ati_COUNTDOWN_SECONDS = 5;
+
     function ati_getMessage(key) { return ati_messages[key] || `[${key}]`; }
+    
     function ati_parseData() {
         const dataContainer = document.getElementById('ati_data');
         if (!dataContainer) return;
@@ -103,6 +105,7 @@
             });
         });
     }
+
     function ati_renderVideoDropdownMenu() {
         if (!ati_videoDropdownMenuEl) return;
         ati_videoDropdownMenuEl.innerHTML = '';
@@ -119,6 +122,7 @@
             ati_videoDropdownMenuEl.appendChild(listItem);
         });
     }
+
     function ati_loadVideoInModal(index, autoplay = true) {
         ati_currentVideoIndex = index;
         const video = ati_playerVideos[index];
@@ -141,14 +145,17 @@
         if (newElement.tagName === 'IFRAME') { newElement.setAttribute('frameborder', '0'); newElement.setAttribute('allowfullscreen', ''); }
         ati_videoPlayerMainAreaEl.prepend(newElement);
     }
+
     window.ati_slideVideoInModal = (direction) => {
         if (ati_playerVideos.length === 0) return;
         const newIndex = (ati_currentVideoIndex + direction + ati_playerVideos.length) % ati_playerVideos.length;
         ati_loadVideoInModal(newIndex, true);
     }
+
     window.ati_toggleVideoDropdown = () => {
         if (ati_videoDropdownMenuEl) { ati_videoDropdownMenuEl.classList.toggle('open'); }
     }
+
     window.ati_openVideoPlayerModal = (startIndex = 0) => {
         ati_cancelAutoOpen();
         if (!ati_videoPlayerModalEl) return;
@@ -158,6 +165,7 @@
         ati_renderVideoDropdownMenu();
         ati_loadVideoInModal(startIndex, true);
     }
+
     window.ati_closeVideoPlayerModal = () => {
         if (ati_videoPlayerModalEl) ati_videoPlayerModalEl.style.display = "none";
         const existingVideo = ati_videoPlayerMainAreaEl.querySelector('iframe, video, .ati_player_message');
@@ -165,6 +173,7 @@
         document.body.style.overflow = 'auto';
         if (ati_videoDropdownMenuEl) ati_videoDropdownMenuEl.classList.remove('open');
     }
+
     document.addEventListener("keydown", function(e) {
         if (ati_videoPlayerModalEl && ati_videoPlayerModalEl.style.display === "block") {
             if (e.key === "Escape") window.ati_closeVideoPlayerModal();
@@ -172,6 +181,7 @@
             if (e.key === "ArrowLeft") { e.preventDefault(); window.ati_slideVideoInModal(-1); }
         }
     });
+
     document.addEventListener('click', function(event) {
         const menuBtn = document.querySelector('.ati_video_player_menu_btn');
         if (ati_videoDropdownMenuEl && ati_videoDropdownMenuEl.classList.contains('open')) {
@@ -180,8 +190,11 @@
             }
         }
     });
+
     const ati_timerOverlayEl = document.getElementById('ati_timer_overlay_id');
+    
     function ati_hideTimerOverlay() { if (ati_timerOverlayEl) { ati_timerOverlayEl.style.display = 'none'; } }
+
     function ati_cancelAutoOpen() {
         if (!ati_isAutoOpenCancelled) {
             ati_isAutoOpenCancelled = true;
@@ -189,6 +202,7 @@
             ati_hideTimerOverlay();
         }
     }
+
     function ati_startAutoOpenCountdown() {
         if (ati_isAutoOpenCancelled || ati_playerVideos.length === 0) return;
         if (ati_timerOverlayEl) ati_timerOverlayEl.style.display = 'flex';
@@ -199,20 +213,36 @@
             }
         }, ati_COUNTDOWN_SECONDS * 1000);
     }
+
     function ati_initialize() {
         ati_parseData();
         const autoOpenBtn = document.getElementById('ati_auto_open_btn');
         if (!autoOpenBtn) return;
+
+        // === समस्या का समाधान: सुधारा हुआ क्लिक और डबल-क्लिक लॉजिक ===
         autoOpenBtn.addEventListener('click', function() {
+            // पिछले क्लिक के टाइमआउट को साफ़ करें (यदि कोई हो)
             clearTimeout(ati_click_timeout);
-            ati_click_timeout = setTimeout(function() { window.ati_openVideoPlayerModal(); }, 250);
+            
+            // एक नया टाइमआउट सेट करें। अगर 250ms में डबल-क्लिक नहीं होता है, तो यह चलेगा।
+            ati_click_timeout = setTimeout(function() {
+                window.ati_openVideoPlayerModal();
+            }, 250);
         });
+
         autoOpenBtn.addEventListener('dblclick', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // ब्राउज़र के डिफ़ॉल्ट डबल-क्लिक व्यवहार को रोकें
+            
+            // सिंगल-क्लिक के लिए सेट किए गए टाइमआउट को रद्द करें ताकि प्लेयर न खुले
             clearTimeout(ati_click_timeout);
+            
+            // अब, केवल ऑटो-प्ले को रद्द करने का काम करें
             ati_cancelAutoOpen();
         });
+        
+        // पेज लोड होने पर ऑटो-ओपन काउंटडाउन शुरू करें
         ati_startAutoOpenCountdown();
     }
+
     document.addEventListener('DOMContentLoaded', ati_initialize);
 })();
