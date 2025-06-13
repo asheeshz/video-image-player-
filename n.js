@@ -1,158 +1,154 @@
 /* ================================================================== */
-/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) - REWRITTEN */
+/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) - FINAL & OPTIMIZED */
 /* ================================================================== */
 (function() {
-    // 1. सभी ज़रूरी HTML एलिमेंट्स को चुनना
-    const mainImage = document.getElementById('qqq-main-gallery-image-animated');
-    const imageTitle = document.getElementById('qqq-image-title-animated');
-    const imageDescription = document.getElementById('qqq-image-description-animated');
-    const imageCounter = document.getElementById('qqq-image-counter-animated');
-    const prevButton = document.querySelector('.qqq-main-arrow-animated.qqq-prev');
-    const nextButton = document.querySelector('.qqq-main-arrow-animated.qqq-next');
-    const hqButton = document.getElementById('qqq-hq-btn-animated'); // नया HQ बटन
-    const downloadButton = document.querySelector('.qqq-download-btn-animated');
-    const shareButton = document.querySelector('.qqq-share-btn-animated');
-    const postUrlConfig = document.getElementById('qqq-gallery-config');
-    const toast = document.getElementById('qqq-download-toast-animated');
-    const galleryItemsContainer = document.getElementById('qqq-gallery-items-data');
-    
-    // यह सुनिश्चित करना कि सभी मुख्य एलिमेंट्स मौजूद हैं
-    if (!mainImage || !galleryItemsContainer) {
-        // console.error("Required gallery elements not found. Aborting qqq-script.");
-        return;
-    }
-
-    // 2. गैलरी का स्टेट (स्थिति)
-    const totalImages = galleryItemsContainer.children.length;
-    let currentIndex = 0;
-    let currentHighQualitySrc = '';
-
-    // 3. मुख्य फंक्शन जो तस्वीर दिखाता है
-    function displayImage(index) {
-        // सीधे n-वें बच्चे को चुनना (बहुत कुशल)
-        const item = document.querySelector(`#qqq-gallery-items-data .qqq-item:nth-child(${index + 1})`);
-        if (!item) return;
-
-        // डेटा एट्रीब्यूट्स से जानकारी निकालना
-        const srcLow = item.getAttribute('data-src-low');
-        const srcHigh = item.getAttribute('data-src-high');
-        const title = item.getAttribute('data-title');
-        const description = item.getAttribute('data-description');
-        
-        // बाद में उपयोग के लिए हाई-क्वालिटी URL को स्टोर करना
-        currentHighQualitySrc = srcHigh;
-
-        // फेड-आउट ट्रांजिशन के लिए क्लास जोड़ना
-        mainImage.classList.add('qqq-fade-out');
-        
-        setTimeout(() => {
-            // शुरू में कम-गुणवत्ता वाली तस्वीर दिखाना
-            mainImage.src = srcLow;
-            mainImage.alt = title;
-            imageTitle.textContent = title;
-            imageDescription.textContent = description;
-
-            // काउंटर अपडेट करना
-            imageCounter.textContent = `${index + 1} / ${totalImages}`;
-
-            // HQ बटन को उसकी डिफ़ॉल्ट स्थिति में रीसेट करना
-            hqButton.classList.remove('active', 'loading');
-            hqButton.disabled = false;
-            
-            // फेड-इन एनीमेशन को फिर से चलाने के लिए क्लास हटाना
-            mainImage.classList.remove('qqq-fade-out');
-            mainImage.style.animation = 'none'; // एनीमेशन रीसेट
-            void mainImage.offsetWidth; // ब्राउज़र को री-रेंडर करने के लिए मजबूर करना
-            mainImage.style.animation = ''; // एनीमेशन को वापस सक्षम करना
-
-        }, 300); // CSS ट्रांजिशन के समय से मेल खाना चाहिए
-
-        // नेविगेशन बटनों को अपडेट करना
-        prevButton.disabled = index === 0;
-        nextButton.disabled = index === totalImages - 1;
-    }
-
-    // --- इवेंट लिस्नर ---
-    
-    // HQ बटन का लॉजिक
-    hqButton.addEventListener('click', () => {
-        if (!hqButton.classList.contains('active')) {
-            hqButton.classList.add('loading');
-            hqButton.disabled = true;
-
-            const tempImg = new Image();
-            tempImg.src = currentHighQualitySrc;
-            
-            tempImg.onload = () => {
-                mainImage.src = currentHighQualitySrc; // स्रोत को हाई-क्वालिटी में बदलें
-                hqButton.classList.remove('loading');
-                hqButton.classList.add('active');
-            };
-            tempImg.onerror = () => {
-                alert('उच्च गुणवत्ता वाली छवि लोड करने में विफल।');
-                hqButton.classList.remove('loading');
-                hqButton.disabled = false;
-            };
-        }
-    });
-
-    // डाउनलोड बटन का लॉजिक (हमेशा हाई-क्वालिटी डाउनलोड)
-    downloadButton.addEventListener('click', () => {
-        if (!currentHighQualitySrc) return;
-        
-        const link = document.createElement('a');
-        link.href = currentHighQualitySrc;
-        link.download = imageTitle.textContent.replace(/ /g, '_') + '.jpg'; // फाइल का नाम सेट करें
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // टोस्ट संदेश दिखाएँ
-        if(toast) {
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 4000);
-        }
-    });
-
-    // शेयर बटन का लॉजिक
-    shareButton.addEventListener('click', async () => {
-        const postUrl = postUrlConfig.getAttribute('data-post-url') || window.location.href;
-        const shareData = {
-            title: document.title,
-            text: `मेरे ब्लॉग से यह तस्वीर देखें: ${imageTitle.textContent}`,
-            url: postUrl
-        };
-        if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) { /* उपयोगकर्ता द्वारा रद्द किया गया */ }
-        } else {
-            alert('आपका ब्राउज़र वेब शेयर का समर्थन नहीं करता है।');
-        }
-    });
-
-    // नेविगेशन का लॉजिक
-    function navigate(direction) {
-        const newIndex = currentIndex + direction;
-        if (newIndex >= 0 && newIndex < totalImages) {
-            currentIndex = newIndex;
-            displayImage(currentIndex);
-        }
-    }
-    
-    prevButton.addEventListener('click', () => navigate(-1));
-    nextButton.addEventListener('click', () => navigate(1));
-
-    // आरंभ करें
+    // DOMContentLoaded यह सुनिश्चित करता है कि स्क्रिप्ट तभी चले जब पूरा HTML लोड हो चुका हो।
     document.addEventListener('DOMContentLoaded', () => {
-      if (totalImages > 0) {
-        displayImage(0); // पहली तस्वीर लोड करें
-      } else {
-        const galleryContainer = document.querySelector('.qqq-gallery-container-animated');
-        if(galleryContainer) galleryContainer.style.display = 'none';
-      }
-    });
+    
+        // 1. सभी ज़रूरी HTML एलिमेंट्स को चुनना
+        const mainImage = document.getElementById('qqq-main-gallery-image-animated');
+        const imageTitle = document.getElementById('qqq-image-title-animated');
+        const imageDescription = document.getElementById('qqq-image-description-animated');
+        const imageCounter = document.getElementById('qqq-image-counter-animated');
+        const prevButton = document.querySelector('.qqq-main-arrow-animated.qqq-prev');
+        const nextButton = document.querySelector('.qqq-main-arrow-animated.qqq-next');
+        const hqButton = document.getElementById('qqq-hq-btn-animated');
+        const downloadButton = document.querySelector('.qqq-download-btn-animated');
+        const shareButton = document.querySelector('.qqq-share-btn-animated');
+        const postUrlConfig = document.getElementById('qqq-gallery-config');
+        const toast = document.getElementById('qqq-download-toast-animated');
+        const galleryItemsContainer = document.getElementById('qqq-gallery-items-data');
 
+        // यह सुनिश्चित करना कि सभी मुख्य एलिमेंट्स मौजूद हैं
+        if (!mainImage || !galleryItemsContainer || !prevButton || !nextButton || !hqButton) {
+            // console.error("Required gallery elements not found. Aborting qqq-script.");
+            return;
+        }
+
+        // 2. गैलरी का स्टेट (स्थिति)
+        // हम केवल कुल संख्या स्टोर कर रहे हैं, पूरा डेटा नहीं।
+        const totalImages = galleryItemsContainer.children.length;
+        let currentIndex = 0;
+        let currentHighQualitySrc = ''; // वर्तमान हाई-क्वालिटी URL को स्टोर करने के लिए
+
+        // 3. मुख्य फंक्शन जो तस्वीर दिखाता है (यह अब ऑन-डिमांड काम करता है)
+        function displayImage(index) {
+            // सीधे n-वें बच्चे को चुनना (बहुत कुशल)
+            // यह केवल एक DOM एलिमेंट को पढ़ता है, 75 को नहीं।
+            const item = document.querySelector(`#qqq-gallery-items-data .qqq-item:nth-child(${index + 1})`);
+            if (!item) return;
+
+            // डेटा एट्रीब्यूट्स से जानकारी तभी निकालना जब ज़रूरत हो
+            const srcLow = item.getAttribute('data-src-low');
+            const srcHigh = item.getAttribute('data-src-high');
+            const title = item.getAttribute('data-title');
+            const description = item.getAttribute('data-description');
+            
+            currentHighQualitySrc = srcHigh; // हाई-क्वालिटी URL को बाद के लिए स्टोर करना
+
+            // फेड-आउट ट्रांजिशन के लिए क्लास जोड़ना
+            mainImage.classList.add('qqq-fade-out');
+            
+            setTimeout(() => {
+                // कम-गुणवत्ता वाली तस्वीर दिखाना
+                mainImage.src = srcLow;
+                mainImage.alt = title;
+                imageTitle.textContent = title;
+                imageDescription.textContent = description;
+                imageCounter.textContent = `${index + 1} / ${totalImages}`;
+
+                // HQ बटन को रीसेट करना
+                hqButton.classList.remove('active', 'loading');
+                hqButton.disabled = false;
+                
+                // फेड-इन एनीमेशन को फिर से चलाने के लिए क्लास हटाना
+                mainImage.classList.remove('qqq-fade-out');
+                
+            }, 300); // यह समय CSS के ट्रांजिशन समय से मेल खाता है
+
+            // नेविगेशन बटनों को अपडेट करना
+            prevButton.disabled = index === 0;
+            nextButton.disabled = index === totalImages - 1;
+        }
+
+        // --- इवेंट लिस्नर ---
+        
+        // HQ बटन का लॉजिक
+        hqButton.addEventListener('click', () => {
+            if (!hqButton.classList.contains('active') && currentHighQualitySrc) {
+                hqButton.classList.add('loading');
+                hqButton.disabled = true;
+
+                const tempImg = new Image();
+                tempImg.src = currentHighQualitySrc;
+                
+                tempImg.onload = () => {
+                    mainImage.src = currentHighQualitySrc;
+                    hqButton.classList.remove('loading');
+                    hqButton.classList.add('active');
+                };
+                tempImg.onerror = () => {
+                    alert('उच्च गुणवत्ता वाली छवि लोड करने में विफल।');
+                    hqButton.classList.remove('loading');
+                    hqButton.disabled = false;
+                };
+            }
+        });
+
+        // डाउनलोड बटन का लॉजिक
+        downloadButton.addEventListener('click', () => {
+            if (!currentHighQualitySrc) return;
+            
+            const link = document.createElement('a');
+            link.href = currentHighQualitySrc;
+            link.download = imageTitle.textContent.replace(/ /g, '_') + '.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            if(toast) {
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            }
+        });
+
+        // शेयर बटन का लॉजिक
+        shareButton.addEventListener('click', async () => {
+            const postUrl = postUrlConfig.getAttribute('data-post-url') || window.location.href;
+            const shareData = {
+                title: document.title,
+                text: `मेरे ब्लॉग से यह तस्वीर देखें: ${imageTitle.textContent}`,
+                url: postUrl
+            };
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) { /* उपयोगकर्ता द्वारा रद्द किया गया */ }
+            } else {
+                alert('आपका ब्राउज़र वेब शेयर का समर्थन नहीं करता है।');
+            }
+        });
+
+        // नेविगेशन का लॉजिक
+        function navigate(direction) {
+            const newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < totalImages) {
+                currentIndex = newIndex;
+                displayImage(currentIndex);
+            }
+        }
+        
+        prevButton.addEventListener('click', () => navigate(-1));
+        nextButton.addEventListener('click', () => navigate(1));
+
+        // आरंभ करें: पेज लोड पर पहली तस्वीर दिखाना
+        if (totalImages > 0) {
+            displayImage(0);
+        } else {
+            const galleryContainer = document.querySelector('.qqq-gallery-container-animated');
+            if(galleryContainer) galleryContainer.style.display = 'none';
+        }
+    });
 })();
 
 /* ================================================================== */
@@ -326,6 +322,13 @@
         
         ati_startAutoOpenCountdown();
     }
-
-    document.addEventListener('DOMContentLoaded', ati_initialize);
+    
+    // यह दूसरे स्क्रिप्ट से टकरा सकता है, इसलिए इसे सिर्फ ati_initialize में ही कॉल करें
+    // document.addEventListener('DOMContentLoaded', ati_initialize);
+    // इसे सुरक्षित बनाने के लिए, हम यह जांच सकते हैं कि क्या पेज पहले से लोड हो चुका है
+    if (document.readyState === "loading") {
+        document.addEventListener('DOMContentLoaded', ati_initialize);
+    } else {
+        ati_initialize();
+    }
 })();
