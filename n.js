@@ -1,12 +1,12 @@
 /* ================================================================== */
-/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) - FINAL & OPTIMIZED */
+/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) - FINAL WITH CUSTOM LOADER */
 /* ================================================================== */
 (function() {
-    // DOMContentLoaded यह सुनिश्चित करता है कि स्क्रिप्ट तभी चले जब पूरा HTML लोड हो चुका हो।
-    document.addEventListener('DOMContentLoaded', () => {
-    
+    // यह मुख्य फ़ंक्शन है जो गैलरी को शुरू करेगा।
+    function initQqqGallery() {
         // 1. सभी ज़रूरी HTML एलिमेंट्स को चुनना
         const mainImage = document.getElementById('qqq-main-gallery-image-animated');
+        const loaderOverlay = document.getElementById('qqq-loader-overlay'); // नया लोडर
         const imageTitle = document.getElementById('qqq-image-title-animated');
         const imageDescription = document.getElementById('qqq-image-description-animated');
         const imageCounter = document.getElementById('qqq-image-counter-animated');
@@ -19,69 +19,105 @@
         const toast = document.getElementById('qqq-download-toast-animated');
         const galleryItemsContainer = document.getElementById('qqq-gallery-items-data');
 
-        // यह सुनिश्चित करना कि सभी मुख्य एलिमेंट्स मौजूद हैं
-        if (!mainImage || !galleryItemsContainer || !prevButton || !nextButton || !hqButton) {
-            // console.error("Required gallery elements not found. Aborting qqq-script.");
+        // 2. सुरक्षा जांच: अगर कोई एलिमेंट नहीं मिलता है, तो स्क्रिप्ट को रोक दें।
+        if (!mainImage || !loaderOverlay || !galleryItemsContainer || !prevButton || !nextButton || !hqButton) {
+            console.error("QQQ Gallery Error: One or more essential HTML elements are missing. The script will not run.");
             return;
         }
 
-        // 2. गैलरी का स्टेट (स्थिति)
-        // हम केवल कुल संख्या स्टोर कर रहे हैं, पूरा डेटा नहीं।
+        // 3. गैलरी का स्टेट
         const totalImages = galleryItemsContainer.children.length;
+        if (totalImages === 0) {
+             const galleryContainer = document.querySelector('.qqq-gallery-container-animated');
+             if(galleryContainer) galleryContainer.style.display = 'none';
+             return; // अगर कोई इमेज नहीं है तो आगे कुछ न करें।
+        }
+        
         let currentIndex = 0;
-        let currentHighQualitySrc = ''; // वर्तमान हाई-क्वालिटी URL को स्टोर करने के लिए
+        let currentHighQualitySrc = '';
+        let isNavigating = false; // नेविगेशन के दौरान दोबारा क्लिक को रोकने के लिए
 
-        // 3. मुख्य फंक्शन जो तस्वीर दिखाता है (यह अब ऑन-डिमांड काम करता है)
+        // 4. मुख्य फंक्शन: तस्वीर को प्रीलोड करना और फिर दिखाना
         function displayImage(index) {
-            // सीधे n-वें बच्चे को चुनना (बहुत कुशल)
-            // यह केवल एक DOM एलिमेंट को पढ़ता है, 75 को नहीं।
-            const item = document.querySelector(`#qqq-gallery-items-data .qqq-item:nth-child(${index + 1})`);
-            if (!item) return;
+            if (isNavigating) return; // अगर पहले से ही कोई ट्रांज़िशन चल रहा है, तो कुछ न करें
+            isNavigating = true;
 
-            // डेटा एट्रीब्यूट्स से जानकारी तभी निकालना जब ज़रूरत हो
+            // तुरंत इमेज छिपाएं और लोडर दिखाएं
+            mainImage.classList.add('qqq-is-loading');
+            loaderOverlay.classList.add('visible');
+
+            const item = galleryItemsContainer.children[index];
+            if (!item) {
+                isNavigating = false;
+                loaderOverlay.classList.remove('visible');
+                return;
+            }
+
             const srcLow = item.getAttribute('data-src-low');
             const srcHigh = item.getAttribute('data-src-high');
             const title = item.getAttribute('data-title');
             const description = item.getAttribute('data-description');
-            
-            currentHighQualitySrc = srcHigh; // हाई-क्वालिटी URL को बाद के लिए स्टोर करना
 
-            // फेड-आउट ट्रांजिशन के लिए क्लास जोड़ना
-            mainImage.classList.add('qqq-fade-out');
-            
-            setTimeout(() => {
-                // कम-गुणवत्ता वाली तस्वीर दिखाना
+            // बैकग्राउंड में इमेज प्रीलोड करें
+            const preloader = new Image();
+            preloader.src = srcLow;
+
+            preloader.onload = () => {
+                currentHighQualitySrc = srcHigh;
+                currentIndex = index;
+
+                // छिपी हुई इमेज का src बदलें
                 mainImage.src = srcLow;
                 mainImage.alt = title;
+
+                // बाकी जानकारी अपडेट करें
                 imageTitle.textContent = title;
                 imageDescription.textContent = description;
-                imageCounter.textContent = `${index + 1} / ${totalImages}`;
-
-                // HQ बटन को रीसेट करना
+                imageCounter.textContent = `${currentIndex + 1} / ${totalImages}`;
                 hqButton.classList.remove('active', 'loading');
                 hqButton.disabled = false;
                 
-                // फेड-इन एनीमेशन को फिर से चलाने के लिए क्लास हटाना
-                mainImage.classList.remove('qqq-fade-out');
-                
-            }, 300); // यह समय CSS के ट्रांजिशन समय से मेल खाता है
+                // लोडर छिपाएं और नई इमेज दिखाएं
+                loaderOverlay.classList.remove('visible');
+                mainImage.classList.remove('qqq-is-loading');
 
-            // नेविगेशन बटनों को अपडेट करना
-            prevButton.disabled = index === 0;
-            nextButton.disabled = index === totalImages - 1;
+                // नेविगेशन बटनों को अपडेट करें
+                prevButton.disabled = (currentIndex === 0);
+                nextButton.disabled = (currentIndex === totalImages - 1);
+                isNavigating = false;
+            };
+
+            preloader.onerror = () => {
+                console.error("Failed to preload image: " + srcLow);
+                loaderOverlay.querySelector('p').textContent = 'इमेज लोड करने में त्रुटि हुई।';
+                // 2 सेकंड बाद उपयोगकर्ता को फिर से प्रयास करने दें
+                setTimeout(() => {
+                    loaderOverlay.classList.remove('visible');
+                    mainImage.classList.remove('qqq-is-loading'); // पुरानी इमेज वापस दिखाएं
+                    isNavigating = false;
+                    prevButton.disabled = (currentIndex === 0);
+                    nextButton.disabled = (currentIndex === totalImages - 1);
+                }, 2000);
+            };
         }
 
-        // --- इवेंट लिस्नर ---
+        // 5. बटनों के लिए इवेंट लिस्नर
+        function navigate(direction) {
+            const newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < totalImages) {
+                displayImage(newIndex);
+            }
+        }
         
-        // HQ बटन का लॉजिक
+        prevButton.addEventListener('click', () => navigate(-1));
+        nextButton.addEventListener('click', () => navigate(1));
+
         hqButton.addEventListener('click', () => {
             if (!hqButton.classList.contains('active') && currentHighQualitySrc) {
                 hqButton.classList.add('loading');
                 hqButton.disabled = true;
-
                 const tempImg = new Image();
                 tempImg.src = currentHighQualitySrc;
-                
                 tempImg.onload = () => {
                     mainImage.src = currentHighQualitySrc;
                     hqButton.classList.remove('loading');
@@ -95,10 +131,8 @@
             }
         });
 
-        // डाउनलोड बटन का लॉजिक
         downloadButton.addEventListener('click', () => {
             if (!currentHighQualitySrc) return;
-            
             const link = document.createElement('a');
             link.href = currentHighQualitySrc;
             link.download = imageTitle.textContent.replace(/ /g, '_') + '.jpg';
@@ -112,43 +146,29 @@
             }
         });
 
-        // शेयर बटन का लॉजिक
         shareButton.addEventListener('click', async () => {
-            const postUrl = postUrlConfig.getAttribute('data-post-url') || window.location.href;
-            const shareData = {
-                title: document.title,
-                text: `मेरे ब्लॉग से यह तस्वीर देखें: ${imageTitle.textContent}`,
-                url: postUrl
-            };
+            const postUrl = postUrlConfig ? postUrlConfig.getAttribute('data-post-url') : window.location.href;
             if (navigator.share) {
                 try {
-                    await navigator.share(shareData);
-                } catch (err) { /* उपयोगकर्ता द्वारा रद्द किया गया */ }
-            } else {
-                alert('आपका ब्राउज़र वेब शेयर का समर्थन नहीं करता है।');
+                    await navigator.share({
+                        title: imageTitle.textContent,
+                        text: `${imageTitle.textContent} - ${imageDescription.textContent}`,
+                        url: postUrl
+                    });
+                } catch (err) {}
             }
         });
-
-        // नेविगेशन का लॉजिक
-        function navigate(direction) {
-            const newIndex = currentIndex + direction;
-            if (newIndex >= 0 && newIndex < totalImages) {
-                currentIndex = newIndex;
-                displayImage(currentIndex);
-            }
-        }
         
-        prevButton.addEventListener('click', () => navigate(-1));
-        nextButton.addEventListener('click', () => navigate(1));
+        // 6. गैलरी को शुरू करना
+        displayImage(0);
+    }
 
-        // आरंभ करें: पेज लोड पर पहली तस्वीर दिखाना
-        if (totalImages > 0) {
-            displayImage(0);
-        } else {
-            const galleryContainer = document.querySelector('.qqq-gallery-container-animated');
-            if(galleryContainer) galleryContainer.style.display = 'none';
-        }
-    });
+    // 7. स्क्रिप्ट को चलाने के लिए सबसे विश्वसनीय तरीका
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initQqqGallery);
+    } else {
+        initQqqGallery();
+    }
 })();
 
 /* ================================================================== */
@@ -323,10 +343,7 @@
         ati_startAutoOpenCountdown();
     }
     
-    // यह दूसरे स्क्रिप्ट से टकरा सकता है, इसलिए इसे सिर्फ ati_initialize में ही कॉल करें
-    // document.addEventListener('DOMContentLoaded', ati_initialize);
-    // इसे सुरक्षित बनाने के लिए, हम यह जांच सकते हैं कि क्या पेज पहले से लोड हो चुका है
-    if (document.readyState === "loading") {
+    if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', ati_initialize);
     } else {
         ati_initialize();
