@@ -1,25 +1,27 @@
 /* ====================================================== */
-/* STYLES (CSS) - ati Player */
+/* STYLES (CSS) - पूरी तरह से ati_ प्रीफिक्स के साथ संशोधित */
 /* ====================================================== */
-@keyframes pulseGlow {
+@keyframes ati_pulseGlow {
     0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35); }
     50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.55); }
 }
-@keyframes shineAnimation {
+@keyframes ati_shineAnimation {
     0% { transform: translateX(-150%) skewX(-30deg); }
     100% { transform: translateX(150%) skewX(-30deg); }
 }
+@keyframes ati_playerModalOpenAnimation { 
+    from {opacity: 0; transform: scale(0.95);} 
+    to {opacity: 1; transform: scale(1);} 
+}
 
-/* --- Action Button Container --- */
-.ati-action-container {
+/* --- मुख्य कंटेनर और बटन --- */
+.ati_action_container {
     display: flex;
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
 }
-
-/* --- Aspect Ratio Box for Buttons --- */
-.ati-action-box {
+.ati_action_box {
     position: relative;
     width: 100%;
     max-width: 280px;
@@ -28,19 +30,17 @@
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
-    animation: pulseGlow 3s infinite ease-in-out;
+    animation: ati_pulseGlow 3s infinite ease-in-out;
 }
-.ati-action-box:hover {
+.ati_action_box:hover {
     transform: translateY(-5px) scale(1.03);
     animation-play-state: paused;
     box-shadow: 0 8px 30px rgba(255, 215, 0, 0.7);
 }
-
-/* --- वीडियो बटन का बैकग्राउंड --- */
-#video-button-box {
+#ati_video_button_box {
      background: radial-gradient(circle, #3a3a3a 0%, #1a1a1a 100%);
 }
-#video-button-box::after {
+#ati_video_button_box::after {
     content: '';
     position: absolute;
     top: 0;
@@ -48,17 +48,18 @@
     width: 50%;
     height: 100%;
     background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0) 100%);
-    animation: shineAnimation 4s infinite linear 1s;
+    animation: ati_shineAnimation 4s infinite linear 1s;
     z-index: 1;
 }
-
-/* --- Main Button Styling --- */
-.ati-button {
+#ati_photo_button_box {
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9AcPwyazt2PFX0viwilAQvx08o-QgnmMWqTHeI-nXBr0zRwbee6xbxqdg2wUrCvXC78MP4XUu2yTqFiWnbvaQ4X5V8fXAZv5-YzzD0LTK_49Da-PHzGWp0CeNsRMU4XAQpwAlIsBM7wWip979TSOjXgG_oJcZ6akMVQX3qM3GdqQkthpVWlLLxAL6-lFk/s850/image_search_1749711565306.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.ati_button {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -77,47 +78,28 @@
     transition: transform 0.35s ease-out;
     z-index: 2;
 }
-
-/* --- फोटो गैलरी बटन का बैकग्राउंड --- */
-#photo-button-box {
-    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9AcPwyazt2PFX0viwilAQvx08o-QgnmMWqTHeI-nXBr0zRwbee6xbxqdg2wUrCvXC78MP4XUu2yTqFiWnbvaQ4X5V8fXAZv5-YzzD0LTK_49Da-PHzGWp0CeNsRMU4XAQpwAlIsBM7wWip979TSOjXgG_oJcZ6akMVQX3qM3GdqQkthpVWlLLxAL6-lFk/s850/image_search_1749711565306.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-/* === आइकॉन के लिए ग्रेडिएंट स्टाइल (Font Awesome 6 के लिए अपडेट किया गया) === */
-.ati-button .fa-image,
-#ati-auto-open-btn::before {
-    font-family: 'Font Awesome 6 Free'; /* Font Awesome 6 के लिए */
-    font-weight: 900; /* सॉलिड आइकॉन के लिए आवश्यक */
-    content: '\f04b'; /* प्ले आइकॉन का करैक्टर */
+.ati_button .fa-photo,
+#ati_auto_open_btn::before {
+    font-family: FontAwesome;
+    content: '\f04b';
     font-size: 3.5em;
     margin-bottom: 10px;
     line-height: 1;
-    /* ग्रेडिएंट तकनीक */
     background: linear-gradient(45deg, #FFFACD, #FFD700, #FFB347);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     transition: all 0.3s ease;
 }
-/* फोटो आइकॉन का करैक्टर ओवरराइड */
-.ati-button .fa-image::before {
-    content: '\f03e'; /* Font Awesome Photo/Image Icon */
-}
-/* वीडियो आइकॉन के लिए content को खाली करें ताकि pseudo-element वाला दिखे */
-#ati-auto-open-btn::before {
-    content: '\f04b'; /* प्ले आइकॉन */
-}
-
-/* होवर पर आइकॉन का स्केल */
-.ati-action-box:hover .ati-button .fa-image,
-.ati-action-box:hover #ati-auto-open-btn::before {
+.ati_button .fa-photo::before { content: '\f03e'; }
+#ati_auto_open_btn::before { content: '\f04b'; }
+.ati_action_box:hover .ati_button .fa-photo,
+.ati_action_box:hover #ati_auto_open_btn::before {
     transform: scale(1.1);
 }
 
-/* === ऑटो-प्ले टाइमर का ओवरले === */
-.ati-timer-overlay {
+/* --- टाइमर ओवरले --- */
+.ati_timer_overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.75);
@@ -126,35 +108,36 @@
     font-family: 'Teko', sans-serif;
     backdrop-filter: blur(2px);
 }
-.ati-timer-overlay img { width: 100px; height: 100px; }
-.ati-timer-overlay p { margin-top: 10px; font-size: 1.1em; letter-spacing: 1px; text-shadow: 1px 1px 3px #000; }
+.ati_timer_overlay img { width: 100px; height: 100px; }
+.ati_timer_overlay p { margin-top: 10px; font-size: 1.1em; letter-spacing: 1px; text-shadow: 1px 1px 3px #000; }
 
-/* === अतिरिक्त नेविगेशन बटन === */
-.additional-nav-buttons{ margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-.ati-nav-link-button { display: inline-flex; align-items: center; padding: 8px 18px; background: #2c3e50; color: #FFD700; border: 2px solid #FFD700; border-radius: 8px; text-decoration: none; font-family: 'Teko', sans-serif; font-size: 1.2em; letter-spacing: 1px; text-transform: uppercase; transition: all 0.25s ease; box-shadow: 0 2px 5px rgba(0,0,0,.4); }
-.ati-nav-link-button .fa-solid { margin-right: 8px; font-size: 1.1em; }
-.ati-nav-link-button:hover { background: #FFD700; color: #2c3e50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); }
+/* --- अतिरिक्त नेविगेशन बटन --- */
+.ati_additional_nav_buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.ati_nav_link_button { display: inline-flex; align-items: center; padding: 8px 18px; background: #2c3e50; color: #FFD700; border: 2px solid #FFD700; border-radius: 8px; text-decoration: none; font-family: 'Teko', sans-serif; font-size: 1.2em; letter-spacing: 1px; text-transform: uppercase; transition: all 0.25s ease; box-shadow: 0 2px 5px rgba(0,0,0,.4); }
+.ati_nav_link_button .fa { margin-right: 8px; font-size: 1.1em; }
+.ati_nav_link_button:hover { background: #FFD700; color: #2c3e50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); }
 
-/* --- Video Player Modal --- */
-.ati-video-player-modal { display: none; position: fixed; z-index: 10001; left: 0; right: 0; top: 0; bottom: 0; background-color: transparent; backdrop-filter: blur(6px); animation: playerModalOpenAnimation 0.4s ease-out; padding: 0; box-sizing: border-box; }
-@keyframes playerModalOpenAnimation { from {opacity: 0; transform: scale(0.95);} to {opacity: 1; transform: scale(1);} }
-.ati-video-player-modal-content { position: relative; width: 100%; height: 100%; background-color: #000; display: flex; flex-direction: column; border-radius: 0; overflow: visible; box-shadow: 0 10px 40px rgba(0,0,0,0.75); border: 5px solid #FFC107; padding: 0; box-sizing: border-box; }
-.ati-video-player-modal-header { max-width: 50%; min-width: 300px; margin: 0 auto 5px; padding: 2px 12px; background-color: rgba(20,5,45,0.9); color: #FFD700; border: 1.5px solid #C71585; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; position: relative; z-index: 10; font-family: sans-serif; }
-.ati-video-player-modal-title { font-size: clamp(1em, 1.5vw, 1.2em); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-right: 10px; }
-.ati-video-player-menu-btn { color: #FFB347; font-size: 1.5em; cursor: pointer; background: none; border: none; padding: 5px 8px; transition: color 0.2s, transform 0.2s; line-height: 1; margin-right: auto; }
-.ati-video-player-modal-close-btn { color: #FFB347; font-size: 1.5em; font-weight: bold; cursor: pointer; background: none; border: none; padding: 0 5px; transition: color 0.2s, transform 0.2s; }
-.ati-video-player-modal-close-btn:hover, .ati-video-player-menu-btn:hover { color: #FF4500; transform: scale(1.1); }
-.video-player-main-area { width: 100%; flex-grow: 1; background-color: #000; position: relative; overflow: hidden; }
-.video-player-main-area iframe, .video-player-main-area video { position: absolute; top: 0; left:0; width: 100%; height: 100%; border: none; display: block; }
-.video-player-main-nav { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(15,3,25,0.6); color: #FFB347; border: 1px solid rgba(255,179,71,0.5); font-size: 1.8em; padding: 8px; cursor: pointer; z-index: 3; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease; }
-.video-player-main-nav:hover { background-color: rgba(255,179,71,0.3); border-color: #FFD700; transform: translateY(-50%) scale(1.08); }
-.video-player-main-prev { left: 15px; }
-.video-player-main-next { right: 15px; }
-.video-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; width: 100%; background-color: rgba(10,2,20,0.98); border: 1px solid #FFB347; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 11; max-height: 300px; overflow-y: auto; }
-.video-dropdown-menu.open { display: block; }
-.video-dropdown-menu::-webkit-scrollbar { width: 5px; }
-.video-dropdown-menu::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
-.video-dropdown-menu::-webkit-scrollbar-thumb { background: #FFB347; }
-.video-dropdown-item { padding: 10px 15px; color: #FFDAB9; font-size: 0.95em; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color 0.2s; }
-.video-dropdown-item:hover { background-color: rgba(255,179,71,0.25); }
-.video-dropdown-item.active-video-item { background-color: rgba(255,179,71,0.35); font-weight: bold; color: #fff; }
+/* --- वीडियो प्लेयर मोडल --- */
+.ati_video_player_modal { display: none; position: fixed; z-index: 10001; left: 0; right: 0; top: 0; bottom: 0; background-color: transparent; backdrop-filter: blur(6px); animation: ati_playerModalOpenAnimation 0.4s ease-out; padding: 0; box-sizing: border-box; }
+.ati_video_player_modal_content { position: relative; width: 100%; height: 100%; background-color: #000; display: flex; flex-direction: column; border-radius: 0; overflow: visible; box-shadow: 0 10px 40px rgba(0,0,0,0.75); border: 5px solid #FFC107; padding: 0; box-sizing: border-box; }
+.ati_video_player_modal_header { max-width: 50%; min-width: 300px; margin: 0 auto 5px; padding: 2px 12px; background-color: rgba(20,5,45,0.9); color: #FFD700; border: 1.5px solid #C71585; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; position: relative; z-index: 10; font-family: sans-serif; }
+.ati_video_player_modal_title { font-size: clamp(1em, 1.5vw, 1.2em); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-right: 10px; }
+.ati_video_player_menu_btn { color: #FFB347; font-size: 1.5em; cursor: pointer; background: none; border: none; padding: 5px 8px; transition: color 0.2s, transform 0.2s; line-height: 1; margin-right: auto; }
+.ati_video_player_modal_close_btn { color: #FFB347; font-size: 1.5em; font-weight: bold; cursor: pointer; background: none; border: none; padding: 0 5px; transition: color 0.2s, transform 0.2s; }
+.ati_video_player_modal_close_btn:hover, .ati_video_player_menu_btn:hover { color: #FF4500; transform: scale(1.1); }
+.ati_video_player_main_area { width: 100%; flex-grow: 1; background-color: #000; position: relative; overflow: hidden; }
+.ati_video_player_main_area iframe, .ati_video_player_main_area video { position: absolute; top: 0; left:0; width: 100%; height: 100%; border: none; display: block; }
+.ati_video_player_main_nav { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(15,3,25,0.6); color: #FFB347; border: 1px solid rgba(255,179,71,0.5); font-size: 1.8em; padding: 8px; cursor: pointer; z-index: 3; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease; }
+.ati_video_player_main_nav:hover { background-color: rgba(255,179,71,0.3); border-color: #FFD700; transform: translateY(-50%) scale(1.08); }
+.ati_video_player_main_prev { left: 15px; }
+.ati_video_player_main_next { right: 15px; }
+
+/* --- वीडियो ड्रॉपडाउन मेनू --- */
+.ati_video_dropdown_menu { display: none; position: absolute; top: 100%; left: 0; width: 100%; background-color: rgba(10,2,20,0.98); border: 1px solid #FFB347; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 11; max-height: 300px; overflow-y: auto; }
+.ati_video_dropdown_menu.open { display: block; }
+.ati_video_dropdown_menu::-webkit-scrollbar { width: 5px; }
+.ati_video_dropdown_menu::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+.ati_video_dropdown_menu::-webkit-scrollbar-thumb { background: #FFB347; }
+.ati_video_dropdown_item { padding: 10px 15px; color: #FFDAB9; font-size: 0.95em; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color 0.2s; }
+.ati_video_dropdown_item:hover { background-color: rgba(255,179,71,0.25); }
+.ati_video_dropdown_item.ati_active_video_item { background-color: rgba(255,179,71,0.35); font-weight: bold; color: #fff; }
