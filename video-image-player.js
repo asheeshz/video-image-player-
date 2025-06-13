@@ -1,10 +1,12 @@
-// ==========================================================
-// === विजेट 1: एनिमेटेड इमेज गैलरी
-// === इस कोड को एक IIFE (Immediately Invoked Function Expression) में लपेटा गया है
-// === ताकि इसके वेरिएबल्स और फंक्शन्स दूसरे स्क्रिप्ट से न टकराएं।
-// ==========================================================
+/* ================================================================== */
+/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-)                */
+/* This script is wrapped in an IIFE to prevent global scope pollution. */
+/* ================================================================== */
+
 (function() {
+    // ==========================================================
     // === यह सेक्शन HTML से डेटा पढ़ता है। qqq- प्रीफिक्स जोड़ा गया है। ===
+    // ==========================================================
     let postURLForShare = "";
     let galleryData = [];
     let currentSlideIndex = 0;
@@ -14,7 +16,7 @@
         if (configDiv) {
             postURLForShare = configDiv.dataset.postUrl || "";
         }
-
+        
         const itemsContainer = document.getElementById('qqq-gallery-items-data');
         if (itemsContainer) {
             const itemDivs = itemsContainer.querySelectorAll('.qqq-item');
@@ -33,75 +35,56 @@
         if (galleryData.length > 0) {
             displaySlide(0);
         }
+        // NOTE: If your buttons like arrows call navigate() from HTML (e.g., onclick="navigate(1)"),
+        // you would need to expose the function like this: window.qqq_navigate = navigate;
+        // But if event listeners are added via JS, this is not needed.
     }
 
     function displaySlide(index) {
         if (index < 0 || index >= galleryData.length) return;
-        currentSlideIndex = index; // currentSlideIndex को यहाँ अपडेट करना महत्वपूर्ण है
         const item = galleryData[index];
         const mainImage = document.getElementById("qqq-main-gallery-image-animated");
-        if (!mainImage) return;
-
         mainImage.classList.add('qqq-fade-out');
-
         setTimeout(() => {
             mainImage.src = item.mainSrc;
             mainImage.alt = item.title;
             mainImage.classList.remove('qqq-fade-out');
             mainImage.style.animation = 'none';
-            void mainImage.offsetHeight; // रिफ्लो ट्रिगर करें
+            mainImage.offsetHeight;
             mainImage.style.animation = null;
-
             const counterElement = document.getElementById("qqq-image-counter-animated");
-            if (counterElement) {
+            if(counterElement) {
                 counterElement.innerText = `${currentSlideIndex + 1} / ${galleryData.length}`;
             }
         }, 300);
-
-        const titleEl = document.getElementById("qqq-image-title-animated");
-        if(titleEl) titleEl.innerText = item.title || "";
-        
-        const descriptionEl = document.getElementById("qqq-image-description-animated");
-        if(descriptionEl) descriptionEl.innerText = item.description || "";
+        document.getElementById("qqq-image-title-animated").innerText = item.title || "";
+        document.getElementById("qqq-image-description-animated").innerText = item.description || "";
     }
 
+    // These functions are now private to this IIFE.
+    // If they are called from HTML onclick attributes, they must be attached to the 'window' object.
+    // Example: window.qqq_navigate = function(n) { ... };
     function navigate(n) {
-        let newIndex = currentSlideIndex + n;
-        if (newIndex >= galleryData.length) {
-            newIndex = 0;
-        }
-        if (newIndex < 0) {
-            newIndex = galleryData.length - 1;
-        }
-        displaySlide(newIndex);
+        currentSlideIndex += n;
+        if (currentSlideIndex >= galleryData.length) { currentSlideIndex = 0; }
+        if (currentSlideIndex < 0) { currentSlideIndex = galleryData.length - 1; }
+        displaySlide(currentSlideIndex);
     }
 
     async function shareCurrentImage() {
         const currentItem = galleryData[currentSlideIndex];
         if (!currentItem || !postURLForShare) return;
-        const shareData = {
-            title: document.title,
-            text: `मेरे ब्लॉग से यह तस्वीर देखें: ${currentItem.title}`,
-            url: postURLForShare
-        };
+        const shareData = { title: document.title, text: `मेरे ब्लॉग से यह तस्वीर देखें: ${currentItem.title}`, url: postURLForShare };
         if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-            } catch (err) {
-                console.error("शेयर नहीं किया जा सका:", err);
-            }
-        } else {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareData.text)} - ${encodeURIComponent(shareData.url)}`, "_blank");
-        }
+            try { await navigator.share(shareData); } catch (err) {}
+        } else { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareData.text)} - ${encodeURIComponent(shareData.url)}`, "_blank"); }
     }
 
     function showDownloadMessage() {
         const toast = document.getElementById("qqq-download-toast-animated");
         if (!toast) return;
         toast.className = "qqq-toast-animated show";
-        setTimeout(() => {
-            toast.className = toast.className.replace("show", "");
-        }, 4000);
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 4000);
     }
 
     // पेज लोड होते ही डेटा पार्स करें और फिर गैलरी शुरू करें
@@ -109,57 +92,54 @@
         parseDataFromHTML();
         initializeAnimatedGallery();
         
-        // नेविगेशन और अन्य बटनों के लिए इवेंट लिस्टनर यहाँ जोड़ें
-        // यह सुनिश्चित करेगा कि वे केवल इस विजेट के लिए काम करें
-        const prevButton = document.querySelector('.qqq-prev-animated');
-        if(prevButton) prevButton.addEventListener('click', () => navigate(-1));
+        // Example of how to add event listeners dynamically from within the script
+        const prevArrow = document.querySelector('.qqq-main-arrow-animated.qqq-prev');
+        const nextArrow = document.querySelector('.qqq-main-arrow-animated.qqq-next');
+        const shareBtn = document.querySelector('.qqq-share-btn-animated');
+        const downloadBtn = document.querySelector('.qqq-download-btn-animated');
 
-        const nextButton = document.querySelector('.qqq-next-animated');
-        if(nextButton) nextButton.addEventListener('click', () => navigate(1));
-
-        const shareButton = document.getElementById('qqq-share-btn-animated');
-        if(shareButton) shareButton.addEventListener('click', shareCurrentImage);
-        
-        const downloadButton = document.getElementById('qqq-download-btn-animated');
-        if(downloadButton) downloadButton.addEventListener('click', showDownloadMessage);
+        if(prevArrow) prevArrow.addEventListener('click', () => navigate(-1));
+        if(nextArrow) nextArrow.addEventListener('click', () => navigate(1));
+        if(shareBtn) shareBtn.addEventListener('click', shareCurrentImage);
+        if(downloadBtn) downloadBtn.addEventListener('click', showDownloadMessage);
     });
-})(); // इमेज गैलरी IIFE यहाँ समाप्त होता है
+})();
 
 
-// ==========================================================
-// === विजेट 2: वीडियो प्लेयर
-// === यह कोड पहले से ही एक सुरक्षित IIFE में था, इसलिए इसमें कोई बदलाव की जरूरत नहीं है।
-// ==========================================================
+
+/* ================================================================== */
+/* SCRIPT FOR WIDGET 2: VIDEO PLAYER (PREFIX: ati_)                   */
+/* This script was already in an IIFE, ensuring its scope is isolated.  */
+/* ================================================================== */
+
 (function() {
-    let playerVideos = [];
-    let currentVideoIndex = 0;
-    let messages = {};
-    const videoPlayerModalEl = document.getElementById("player3_videoPlayerModal");
-    const videoPlayerMainAreaEl = document.getElementById("player3_videoPlayerMainArea");
-    const videoModalTitleEl = document.getElementById("player3_videoModalTitle");
-    const videoDropdownMenuEl = document.getElementById("videoDropdownMenu");
-    let autoOpenTimer = null;
-    let isAutoOpenCancelled = false;
-    const COUNTDOWN_SECONDS = 5;
-
-    function getMessage(key) {
-        return messages[key] || `[${key}]`;
-    }
-
-    function parseData() {
-        const dataContainer = document.getElementById('player3_data');
+    let ati_playerVideos = []; 
+    let ati_currentVideoIndex = 0; 
+    let ati_messages = {};
+    const ati_videoPlayerModalEl = document.getElementById("ati_videoPlayerModal");
+    const ati_videoPlayerMainAreaEl = document.getElementById("ati_videoPlayerMainArea");
+    const ati_videoModalTitleEl = document.getElementById("ati_videoModalTitle");
+    const ati_videoDropdownMenuEl = document.getElementById("ati_videoDropdownMenu");
+    let ati_autoOpenTimer = null; 
+    let ati_isAutoOpenCancelled = false; 
+    const ati_COUNTDOWN_SECONDS = 5;
+    
+    function ati_getMessage(key) { return ati_messages[key] || `[${key}]`; }
+    
+    function ati_parseData() {
+        const dataContainer = document.getElementById('ati_data');
         if (!dataContainer) return;
-        const msgContainer = dataContainer.querySelector('#player3_messages');
+        const msgContainer = dataContainer.querySelector('#ati_messages');
         if (msgContainer) {
             msgContainer.querySelectorAll('span').forEach(span => {
-                messages[span.dataset.msg] = span.textContent;
+                ati_messages[span.dataset.msg] = span.textContent;
             });
         }
         dataContainer.querySelectorAll('div[data-platform]').forEach(platformDiv => {
             const platform = platformDiv.dataset.platform;
             const embedUrl = platformDiv.dataset.embedUrl;
             platformDiv.querySelectorAll('i').forEach(videoEl => {
-                playerVideos.push({
+                ati_playerVideos.push({
                     platform: platform,
                     id: videoEl.dataset.id,
                     title: videoEl.dataset.title || 'Untitled Video',
@@ -169,34 +149,34 @@
         });
     }
 
-    function renderVideoDropdownMenu() {
-        if (!videoDropdownMenuEl) return;
-        videoDropdownMenuEl.innerHTML = '';
-        if (playerVideos.length === 0) return;
-        playerVideos.forEach((video, index) => {
+    function ati_renderVideoDropdownMenu() {
+        if (!ati_videoDropdownMenuEl) return;
+        ati_videoDropdownMenuEl.innerHTML = '';
+        if (ati_playerVideos.length === 0) return;
+        ati_playerVideos.forEach((video, index) => {
             const listItem = document.createElement('div');
-            listItem.className = 'video-dropdown-item';
+            listItem.className = 'ati_video_dropdown_item';
             listItem.textContent = video.title;
             listItem.title = video.title;
             listItem.onclick = () => {
-                loadVideoInModal(index, true);
-                videoDropdownMenuEl.classList.remove('open');
+                ati_loadVideoInModal(index, true);
+                ati_videoDropdownMenuEl.classList.remove('open');
             };
-            videoDropdownMenuEl.appendChild(listItem);
+            ati_videoDropdownMenuEl.appendChild(listItem);
         });
     }
 
-    function loadVideoInModal(index, autoplay = true) {
-        currentVideoIndex = index;
-        const video = playerVideos[index];
-        if (!video || !videoPlayerMainAreaEl) return;
-        if (videoModalTitleEl) videoModalTitleEl.textContent = video.title;
-        if (videoDropdownMenuEl) {
-            Array.from(videoDropdownMenuEl.children).forEach((item, idx) => {
-                item.classList.toggle('active-video-item', idx === index);
+    function ati_loadVideoInModal(index, autoplay = true) {
+        ati_currentVideoIndex = index;
+        const video = ati_playerVideos[index];
+        if (!video || !ati_videoPlayerMainAreaEl) return;
+        if (ati_videoModalTitleEl) ati_videoModalTitleEl.textContent = video.title;
+        if (ati_videoDropdownMenuEl) {
+            Array.from(ati_videoDropdownMenuEl.children).forEach((item, idx) => {
+                item.classList.toggle('ati_active_video_item', idx === index);
             });
         }
-        const existingVideo = videoPlayerMainAreaEl.querySelector('iframe, video, .player-message');
+        const existingVideo = ati_videoPlayerMainAreaEl.querySelector('iframe, video, .ati_player_message');
         if (existingVideo) existingVideo.remove();
         let newElement;
         const allowPolicy = "autoplay; fullscreen; picture-in-picture; encrypted-media";
@@ -219,117 +199,115 @@
                 break;
             default:
                 newElement = document.createElement('div');
-                newElement.className = 'player-message';
+                newElement.className = 'ati_player_message';
                 newElement.style.cssText = 'color: #ff8a80; display: flex; align-items: center; justify-content: center; height: 100%;';
-                newElement.textContent = getMessage('unsupported_video');
+                newElement.textContent = ati_getMessage('unsupported_video');
                 break;
         }
         if (newElement.tagName === 'IFRAME') {
             newElement.setAttribute('frameborder', '0');
             newElement.setAttribute('allowfullscreen', '');
         }
-        videoPlayerMainAreaEl.prepend(newElement);
+        ati_videoPlayerMainAreaEl.prepend(newElement);
     }
-    
-    window.player3_slideVideoInModal = (direction) => {
-        if (playerVideos.length === 0) return;
-        const newIndex = (currentVideoIndex + direction + playerVideos.length) % playerVideos.length;
-        loadVideoInModal(newIndex, true);
+
+    // Functions attached to the 'window' object are accessible globally (e.g., from HTML onclick attributes).
+    window.ati_slideVideoInModal = (direction) => {
+        if(ati_playerVideos.length === 0) return;
+        const newIndex = (ati_currentVideoIndex + direction + ati_playerVideos.length) % ati_playerVideos.length;
+        ati_loadVideoInModal(newIndex, true);
     }
-    window.player3_toggleVideoDropdown = () => {
-        if (videoDropdownMenuEl) {
-            videoDropdownMenuEl.classList.toggle('open');
+
+    window.ati_toggleVideoDropdown = () => {
+        if (ati_videoDropdownMenuEl) {
+            ati_videoDropdownMenuEl.classList.toggle('open');
         }
     }
-    window.player3_openVideoPlayerModal = (startIndex = 0) => {
-        if (!videoPlayerModalEl) return;
-        if (playerVideos.length === 0) {
-            clearTimeout(autoOpenTimer);
-            hideTimerOverlay();
-            alert(getMessage('no_videos'));
+
+    window.ati_openVideoPlayerModal = (startIndex = 0) => {
+        if (!ati_videoPlayerModalEl) return;
+        if (ati_playerVideos.length === 0) {
+            clearTimeout(ati_autoOpenTimer);
+            ati_hideTimerOverlay();
+            alert(ati_getMessage('no_videos'));
             return;
         }
-        videoPlayerModalEl.style.display = "block";
+        ati_videoPlayerModalEl.style.display = "block";
         document.body.style.overflow = 'hidden';
-        renderVideoDropdownMenu();
-        loadVideoInModal(startIndex, true);
+        ati_renderVideoDropdownMenu();
+        ati_loadVideoInModal(startIndex, true);
     }
-    window.player3_closeVideoPlayerModal = () => {
-        if (videoPlayerModalEl) videoPlayerModalEl.style.display = "none";
-        const existingVideo = videoPlayerMainAreaEl.querySelector('iframe, video, .player-message');
+
+    window.ati_closeVideoPlayerModal = () => {
+        if(ati_videoPlayerModalEl) ati_videoPlayerModalEl.style.display = "none";
+        const existingVideo = ati_videoPlayerMainAreaEl.querySelector('iframe, video, .ati_player_message');
         if (existingVideo) existingVideo.remove();
         document.body.style.overflow = 'auto';
-        if (videoDropdownMenuEl) videoDropdownMenuEl.classList.remove('open');
+        if (ati_videoDropdownMenuEl) ati_videoDropdownMenuEl.classList.remove('open');
     }
-    
-    document.addEventListener("keydown", function(e) {
-        if (videoPlayerModalEl && videoPlayerModalEl.style.display === "block") {
-            if (e.key === "Escape") window.player3_closeVideoPlayerModal();
-            if (e.key === "ArrowRight") {
-                e.preventDefault();
-                window.player3_slideVideoInModal(1);
-            }
-            if (e.key === "ArrowLeft") {
-                e.preventDefault();
-                window.player3_slideVideoInModal(-1);
-            }
+
+    document.addEventListener("keydown", function(e){
+        if (ati_videoPlayerModalEl && ati_videoPlayerModalEl.style.display === "block") {
+            if(e.key === "Escape") window.ati_closeVideoPlayerModal();
+            if(e.key === "ArrowRight") { e.preventDefault(); window.ati_slideVideoInModal(1); }
+            if(e.key === "ArrowLeft") { e.preventDefault(); window.ati_slideVideoInModal(-1); }
         }
     });
-    
+
     document.addEventListener('click', function(event) {
-        const menuBtn = document.querySelector('.ati-video-player-menu-btn');
-        if (videoDropdownMenuEl && videoDropdownMenuEl.classList.contains('open')) {
-            if (!videoDropdownMenuEl.contains(event.target) && (!menuBtn || !menuBtn.contains(event.target))) {
-                videoDropdownMenuEl.classList.remove('open');
+        const menuBtn = document.querySelector('.ati_video_player_menu_btn');
+        if (ati_videoDropdownMenuEl && ati_videoDropdownMenuEl.classList.contains('open')) {
+            if (!ati_videoDropdownMenuEl.contains(event.target) && !menuBtn.contains(event.target)) {
+                ati_videoDropdownMenuEl.classList.remove('open');
             }
         }
     });
 
-    const timerOverlayEl = document.getElementById('ati-timer-overlay-id');
-
-    function hideTimerOverlay() {
-        if (timerOverlayEl) {
-            timerOverlayEl.style.display = 'none';
+    const ati_timerOverlayEl = document.getElementById('ati_timer_overlay_id');
+    
+    function ati_hideTimerOverlay() {
+        if (ati_timerOverlayEl) {
+            ati_timerOverlayEl.style.display = 'none';
         }
     }
-
-    function cancelAutoOpen() {
-        isAutoOpenCancelled = true;
-        clearTimeout(autoOpenTimer);
-        hideTimerOverlay();
+    
+    function ati_cancelAutoOpen() {
+        ati_isAutoOpenCancelled = true;
+        clearTimeout(ati_autoOpenTimer);
+        ati_hideTimerOverlay();
     }
-
-    function startAutoOpenCountdown() {
-        if (isAutoOpenCancelled || playerVideos.length === 0) return;
-        if (timerOverlayEl) timerOverlayEl.style.display = 'flex';
-        autoOpenTimer = setTimeout(() => {
-            if (!isAutoOpenCancelled) {
-                hideTimerOverlay();
-                window.player3_openVideoPlayerModal();
+    
+    function ati_startAutoOpenCountdown() {
+        if (ati_isAutoOpenCancelled || ati_playerVideos.length === 0) return;
+        if (ati_timerOverlayEl) ati_timerOverlayEl.style.display = 'flex';
+        ati_autoOpenTimer = setTimeout(() => {
+            if (!ati_isAutoOpenCancelled) {
+                ati_hideTimerOverlay();
+                window.ati_openVideoPlayerModal();
             }
-        }, COUNTDOWN_SECONDS * 1000);
+        }, ati_COUNTDOWN_SECONDS * 1000);
     }
 
-    function initializeAutoOpenFeature() {
-        const autoOpenBtn = document.getElementById('ati-auto-open-btn');
+    function ati_initialize() {
+        ati_parseData();
+        const autoOpenBtn = document.getElementById('ati_auto_open_btn');
         if (!autoOpenBtn) return;
         autoOpenBtn.addEventListener('click', function() {
-            if (isAutoOpenCancelled) {
-                window.player3_openVideoPlayerModal();
+            if (ati_isAutoOpenCancelled) {
+                window.ati_openVideoPlayerModal();
             } else {
-                cancelAutoOpen();
-                window.player3_openVideoPlayerModal();
+                ati_cancelAutoOpen();
+                window.ati_openVideoPlayerModal();
             }
         });
         autoOpenBtn.addEventListener('dblclick', function(e) {
             e.preventDefault();
-            if (!isAutoOpenCancelled) {
-                cancelAutoOpen();
+            if (!ati_isAutoOpenCancelled) {
+                ati_cancelAutoOpen();
             }
         });
-        startAutoOpenCountdown();
+        ati_startAutoOpenCountdown();
     }
-    
-    parseData();
-    document.addEventListener('DOMContentLoaded', initializeAutoOpenFeature);
-})(); // वीडियो प्लेयर IIFE यहाँ समाप्त होता है
+
+    document.addEventListener('DOMContentLoaded', ati_initialize);
+})();
