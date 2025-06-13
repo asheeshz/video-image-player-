@@ -1,5 +1,5 @@
 /* ====================================================== */
-/* STYLES (CSS) - पूरी तरह से ati_ प्रीफिक्स के साथ संशोधित */
+/* STYLES (CSS) - ati-gallery-styles.css */
 /* ====================================================== */
 @keyframes ati_pulseGlow {
     0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35); }
@@ -78,9 +78,6 @@
     transition: transform 0.35s ease-out;
     z-index: 2;
 }
-
-/* FA6 सुसंगत आइकॉन स्टाइलिंग */
-/* यह स्टाइल HTML में मौजूद <i> टैग और ::before स्यूडो-एलिमेंट दोनों पर लागू होगी */
 .ati_button i,
 #ati_auto_open_btn::before {
     font-size: 3.5em;
@@ -92,20 +89,15 @@
     color: transparent;
     transition: all 0.3s ease;
 }
-
-/* केवल वीडियो बटन के ::before पर आइकॉन बनाने के लिए */
 #ati_auto_open_btn::before {
     font-family: 'Font Awesome 6 Free';
-    font-weight: 900; /* सॉलिड आइकॉन के लिए यह आवश्यक है */
-    content: '\f04b'; /* 'play' आइकॉन का यूनिकोड */
+    font-weight: 900;
+    content: '\f04b';
 }
-
 .ati_action_box:hover .ati_button i,
 .ati_action_box:hover #ati_auto_open_btn::before {
     transform: scale(1.1);
 }
-
-/* --- टाइमर ओवरले --- */
 .ati_timer_overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -117,14 +109,10 @@
 }
 .ati_timer_overlay img { width: 100px; height: 100px; }
 .ati_timer_overlay p { margin-top: 10px; font-size: 1.1em; letter-spacing: 1px; text-shadow: 1px 1px 3px #000; }
-
-/* --- अतिरिक्त नेविगेशन बटन --- */
 .ati_additional_nav_buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
 .ati_nav_link_button { display: inline-flex; align-items: center; padding: 8px 18px; background: #2c3e50; color: #FFD700; border: 2px solid #FFD700; border-radius: 8px; text-decoration: none; font-family: 'Teko', sans-serif; font-size: 1.2em; letter-spacing: 1px; text-transform: uppercase; transition: all 0.25s ease; box-shadow: 0 2px 5px rgba(0,0,0,.4); }
 .ati_nav_link_button i { margin-right: 8px; font-size: 1.1em; }
 .ati_nav_link_button:hover { background: #FFD700; color: #2c3e50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); }
-
-/* --- वीडियो प्लेयर मोडल --- */
 .ati_video_player_modal { display: none; position: fixed; z-index: 10001; left: 0; right: 0; top: 0; bottom: 0; background-color: transparent; backdrop-filter: blur(6px); animation: ati_playerModalOpenAnimation 0.4s ease-out; padding: 0; box-sizing: border-box; }
 .ati_video_player_modal_content { position: relative; width: 100%; height: 100%; background-color: #000; display: flex; flex-direction: column; border-radius: 0; overflow: visible; box-shadow: 0 10px 40px rgba(0,0,0,0.75); border: 5px solid #FFC107; padding: 0; box-sizing: border-box; }
 .ati_video_player_modal_header { max-width: 50%; min-width: 300px; margin: 0 auto 5px; padding: 2px 12px; background-color: rgba(20,5,45,0.9); color: #FFD700; border: 1.5px solid #C71585; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; position: relative; z-index: 10; font-family: sans-serif; }
@@ -138,8 +126,6 @@
 .ati_video_player_main_nav:hover { background-color: rgba(255,179,71,0.3); border-color: #FFD700; transform: translateY(-50%) scale(1.08); }
 .ati_video_player_main_prev { left: 15px; }
 .ati_video_player_main_next { right: 15px; }
-
-/* --- वीडियो ड्रॉपडाउन मेनू --- */
 .ati_video_dropdown_menu { display: none; position: absolute; top: 100%; left: 0; width: 100%; background-color: rgba(10,2,20,0.98); border: 1px solid #FFB347; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 11; max-height: 300px; overflow-y: auto; }
 .ati_video_dropdown_menu.open { display: block; }
 .ati_video_dropdown_menu::-webkit-scrollbar { width: 5px; }
