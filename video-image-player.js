@@ -85,7 +85,7 @@
     const ati_videoDropdownMenuEl = document.getElementById("ati_videoDropdownMenu");
     let ati_autoOpenTimer = null;
     let ati_isAutoOpenCancelled = false;
-    let ati_click_timeout = null; // यह डबल क्लिक का पता लगाने में मदद करेगा
+    let ati_click_timeout = null;
     const ati_COUNTDOWN_SECONDS = 5;
 
     function ati_getMessage(key) { return ati_messages[key] || `[${key}]`; }
@@ -218,29 +218,31 @@
         ati_parseData();
         const autoOpenBtn = document.getElementById('ati_auto_open_btn');
         if (!autoOpenBtn) return;
+        
+        // === समाधान: टाइमर ओवरले पर भी डबल-क्लिक जोड़ा गया ===
+        const timerOverlay = document.getElementById('ati_timer_overlay_id');
+        if (timerOverlay) {
+            timerOverlay.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                ati_cancelAutoOpen();
+            });
+        }
+        // =======================================================
 
-        // === समस्या का समाधान: सुधारा हुआ क्लिक और डबल-क्लिक लॉजिक ===
         autoOpenBtn.addEventListener('click', function() {
-            // पिछले क्लिक के टाइमआउट को साफ़ करें (यदि कोई हो)
             clearTimeout(ati_click_timeout);
-            
-            // एक नया टाइमआउट सेट करें। अगर 250ms में डबल-क्लिक नहीं होता है, तो यह चलेगा।
             ati_click_timeout = setTimeout(function() {
                 window.ati_openVideoPlayerModal();
             }, 250);
         });
 
         autoOpenBtn.addEventListener('dblclick', function(e) {
-            e.preventDefault(); // ब्राउज़र के डिफ़ॉल्ट डबल-क्लिक व्यवहार को रोकें
-            
-            // सिंगल-क्लिक के लिए सेट किए गए टाइमआउट को रद्द करें ताकि प्लेयर न खुले
+            e.preventDefault();
             clearTimeout(ati_click_timeout);
-            
-            // अब, केवल ऑटो-प्ले को रद्द करने का काम करें
             ati_cancelAutoOpen();
         });
         
-        // पेज लोड होने पर ऑटो-ओपन काउंटडाउन शुरू करें
         ati_startAutoOpenCountdown();
     }
 
