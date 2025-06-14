@@ -1,5 +1,5 @@
-/* ================================================================== */
-/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) - FINAL & BULLETPROOF */
+   /* ================================================================== */
+/* SCRIPT FOR WIDGET 1: IMAGE GALLERY (PREFIX: qqq-) - FINAL & DIRECT-LOAD METHOD */
 /* ================================================================== */
 (function() {
     // यह फ़ंक्शन तभी चलेगा जब पूरा HTML पेज लोड हो चुका हो।
@@ -19,9 +19,9 @@
         const toast = document.getElementById('qqq-download-toast-animated');
         const galleryItemsContainer = document.getElementById('qqq-gallery-items-data');
 
-        // 2. सुरक्षा जांच: अगर कोई एलिमेंट नहीं मिलता है, तो स्क्रिप्ट को रोक दें।
-        if (!mainImage || !loaderOverlay || !galleryItemsContainer || !prevButton || !nextButton || !hqButton) {
-            console.error("QQQ Gallery Error: One or more essential HTML elements are missing. The script will not run.");
+        // 2. सुरक्षा जांच
+        if (!mainImage || !loaderOverlay || !galleryItemsContainer) {
+            console.error("QQQ Gallery Error: Core HTML elements are missing.");
             return;
         }
 
@@ -37,61 +37,56 @@
         let currentHighQualitySrc = '';
         let isNavigating = false;
 
-        // 4. मुख्य फंक्शन: तस्वीर को प्रीलोड करना और फिर दिखाना (नया और अचूक लॉजिक)
+        // 4. मुख्य फंक्शन: "डायरेक्ट लोड" विधि
         function displayImage(index) {
             if (isNavigating) return;
             isNavigating = true;
 
-            mainImage.classList.add('qqq-is-loading');
+            // लोडर दिखाएं और इमेज को छिपा दें (opacity से)
             loaderOverlay.classList.add('visible');
+            mainImage.style.opacity = '0';
             loaderOverlay.querySelector('p').innerHTML = "नेटवर्क धीमा है, कृपया प्रतीक्षा करें...<br>इमेज लोड हो रही है।";
 
             const item = galleryItemsContainer.children[index];
-            if (!item) {
-                handleLoadingError("इमेज डेटा नहीं मिला।");
-                return;
-            }
-
             const srcLow = item.getAttribute('data-src-low');
-            const srcHigh = item.getAttribute('data-src-high');
-            const title = item.getAttribute('data-title');
-            const description = item.getAttribute('data-description');
-
-            const preloader = new Image();
-            preloader.src = srcLow;
-
-            // यह विश्वसनीय इवेंट है। जब यह चलता है, इमेज कैश में होती है।
-            preloader.onload = () => {
-                // सीधे DOM अपडेट करें। किसी और onload का इंतजार न करें।
-                currentHighQualitySrc = srcHigh;
-                currentIndex = index;
-
-                mainImage.src = srcLow; // src सेट करें
-                imageTitle.textContent = title;
-                imageDescription.textContent = description;
-                imageCounter.textContent = `${currentIndex + 1} / ${totalImages}`;
+            currentHighQualitySrc = item.getAttribute('data-src-high');
+            
+            // महत्वपूर्ण: इवेंट हैंडलर को src बदलने से पहले सेट करें
+            mainImage.onload = () => {
+                // जब इमेज सफलतापूर्वक लोड और रेंडर हो जाए
+                imageTitle.textContent = item.getAttribute('data-title');
+                imageDescription.textContent = item.getAttribute('data-description');
+                imageCounter.textContent = `${index + 1} / ${totalImages}`;
                 
                 hqButton.classList.remove('active', 'loading');
                 hqButton.disabled = false;
                 
                 loaderOverlay.classList.remove('visible'); // लोडर छिपाएं
-                mainImage.classList.remove('qqq-is-loading'); // इमेज दिखाएं
+                mainImage.style.opacity = '1'; // इमेज दिखाएं
 
-                prevButton.disabled = (currentIndex === 0);
-                nextButton.disabled = (currentIndex === totalImages - 1);
+                prevButton.disabled = (index === 0);
+                nextButton.disabled = (index === totalImages - 1);
                 isNavigating = false;
+
+                // इवेंट हैंडलर को साफ करें ताकि वे अगली बार दोबारा न चलें
+                mainImage.onload = null;
+                mainImage.onerror = null;
             };
 
-            preloader.onerror = () => {
-                handleLoadingError("इमेज डाउनलोड करने में त्रुटि हुई।");
+            mainImage.onerror = () => {
+                handleLoadingError("इमेज लोड करने में त्रुटि हुई।");
+                mainImage.onload = null;
+                mainImage.onerror = null;
             };
+
+            // अब, सीधे mainImage का src बदलें để trigger loading
+            mainImage.src = srcLow;
         }
         
         function handleLoadingError(message) {
             loaderOverlay.querySelector('p').textContent = message;
             setTimeout(() => {
                 loaderOverlay.classList.remove('visible');
-                mainImage.classList.remove('qqq-is-loading');
                 isNavigating = false;
                 prevButton.disabled = (currentIndex === 0);
                 nextButton.disabled = (currentIndex === totalImages - 1);
@@ -102,7 +97,8 @@
         function navigate(direction) {
             const newIndex = currentIndex + direction;
             if (newIndex >= 0 && newIndex < totalImages) {
-                displayImage(newIndex);
+                currentIndex = newIndex;
+                displayImage(currentIndex);
             }
         }
         
@@ -114,12 +110,12 @@
             
             hqButton.classList.add('loading');
             hqButton.disabled = true;
-            
+
             const tempImg = new Image();
             tempImg.src = currentHighQualitySrc;
-            
             tempImg.onload = () => {
-                mainImage.src = currentHighQualitySrc;
+                mainImage.src = currentHighQualitySrc; // src बदलें
+                // mainImage.onload का इंतज़ार करने की ज़रूरत नहीं, क्योंकि यह पहले से ही दिख रहा है
                 hqButton.classList.remove('loading');
                 hqButton.classList.add('active');
             };
@@ -131,7 +127,7 @@
         });
 
         downloadButton.addEventListener('click', () => {
-            if (!currentHighQualitySrc) return;
+             if (!currentHighQualitySrc) return;
             const link = document.createElement('a');
             link.href = currentHighQualitySrc;
             link.download = imageTitle.textContent.replace(/ /g, '_') + '.jpg';
@@ -165,6 +161,9 @@
     }
 })();
 
+/* ================================================================== */
+/* SCRIPT FOR WIDGET 2: VIDEO PLAYER (PREFIX: ati_) - NO CHANGES MADE */
+/* ================================================================== */
 
 
 /* ================================================================== */
