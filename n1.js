@@ -1,0 +1,226 @@
+/* ================================================================== */
+/* CSS FOR WIDGET 1: IMAGE PLAYER (PREFIX: qqq-) */
+/* ================================================================== */
+
+/* --- एनिमेशन्स --- */
+@keyframes qqq-text-glow {
+  0%, 100% { text-shadow: 0 0 5px rgba(194, 24, 91, 0.7), 0 0 10px rgba(255, 64, 129, 0.7); }
+  50% { text-shadow: 0 0 15px rgba(194, 24, 91, 1), 0 0 25px rgba(255, 64, 129, 1); }
+}
+@keyframes qqq-border-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+}
+@keyframes qqq-zoomFadeIn {
+  0% { opacity: 0; transform: scale(.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes qqq-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- मुख्य रैपर और टाइटल --- */
+.qqq-widget-wrapper { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #444; }
+.qqq-widget-title { text-align: center; font-family: 'Teko', sans-serif; font-size: 2.5em; margin-bottom: 25px; font-weight: 700; background: linear-gradient(45deg, #c2185b, #ff4081); -webkit-background-clip: text; background-clip: text; color: transparent; animation: qqq-text-glow 2.5s infinite ease-in-out; }
+.qqq-widget-separator { border: none; border-top: 1px solid #444; margin: 30px auto; }
+.qqq-unified-container { max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 20px; }
+
+/* --- वीडियो बटन (अन्य विजेट्स में उपयोग के लिए) --- */
+.qqq-atithi-action-container {}
+.qqq-atithi-action-box { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #222; border: 2px solid #FFD700; border-radius: 12px; transition: all .3s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 4px 10px rgba(255,215,0,.35); overflow: hidden; }
+.qqq-atithi-action-box:hover{transform:translateY(-5px) scale(1.03);box-shadow:0 8px 20px rgba(255,215,0,.55)}
+.qqq-atithi-button{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Teko',sans-serif;font-size:1.6em;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;text-shadow:2px 2px 6px #000;text-decoration:none;padding:10px;box-sizing:border-box;background-size:cover;background-position:center;background-repeat:no-repeat;transition:transform .35s ease-out}
+.qqq-atithi-action-box:hover .qqq-atithi-button{transform:scale(1.1)}
+.qqq-atithi-button.qqq-video-btn-bg{background-image:linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuEYGxHCbzt5JJYMYXRr12kObH0q3T99pLva8nKtUEOeX9kTPfWzbuVUlzFKMYyZyK0fnhLwfG4PIt8vyISWo8bDUJ3jQPl0JIHeibd8juhkj3wg9BE3_B8z1xxx4uMjPoGZ4zt7pMK6Vk41ZpJ83pLlWOY7ijOvbCUXB1JjcdAR4i8a3pBzu0YmdS47qt/s540/image_search_1749711402902.gif')}
+.qqq-atithi-button .fa-solid{font-size:3.5em;margin-bottom:10px;line-height:1;text-shadow:2px 2px 8px rgba(0,0,0,.7)}
+
+/* --- इमेज गैलरी कंटेनर --- */
+.qqq-gallery-container-animated{font-family:'Lato',sans-serif;background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);padding:15px;border-radius:15px;border:2px solid #D4AF37;animation: qqq-border-glow 3s infinite ease-in-out;}
+.qqq-main-image-viewer-animated{position:relative;width:100%;background:radial-gradient(circle, rgba(46,55,77,1) 0%, rgba(20,29,50,1) 100%);border-radius:12px;overflow:hidden;margin-bottom:15px;min-height:250px;border-bottom:3px solid #D4AF37}
+#qqq-main-gallery-image-animated{width:100%;height:auto;display:block;opacity: 1; transition: opacity 0.3s ease-in-out;}
+
+/* --- लोडर और इमेज लोडिंग स्टेट्स --- */
+.qqq-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(46, 55, 77, 0.95) 0%, rgba(20, 29, 50, 0.98) 100%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    color: #cbd5e1;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+.qqq-loader-overlay.visible {
+    display: flex;
+    opacity: 1;
+}
+.qqq-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #D4AF37;
+    border-radius: 50%;
+    animation: qqq-spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+.qqq-loader-overlay p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-shadow: 1px 1px 2px #000;
+}
+#qqq-main-gallery-image-animated.qqq-is-loading {
+    opacity: 0;
+}
+
+/* --- इमेज विवरण और नियंत्रण --- */
+.qqq-description-box-animated{padding:15px 10px 10px;text-align:center}
+#qqq-image-title-animated{font-family:'Poppins',sans-serif;font-size:1.5rem;color:#fff;margin:0 0 10px;text-shadow:1px 1px 3px rgba(0,0,0,.5)}
+#qqq-image-description-animated{font-size:1rem;line-height:1.6;color:#cbd5e1;margin:0}
+
+.qqq-main-arrow-animated{padding:0;cursor:pointer;position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-weight:700;font-size:16px;width:28px;height:28px;transition:.3s;border-radius:50%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);user-select:none; z-index: 6;}
+.qqq-main-arrow-animated.qqq-next{right:10px}.qqq-main-arrow-animated.qqq-prev{left:10px}
+.qqq-main-arrow-animated:hover:not(:disabled){background-color:rgba(0,0,0,.6)}
+.qqq-main-arrow-animated:disabled { cursor: not-allowed; opacity: 0.4; }
+
+.qqq-floating-buttons-animated{position:absolute;bottom:10px;right:10px;display:flex;gap:8px;align-items:center; z-index: 6;}
+.qqq-floating-buttons-animated button{padding:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:all .3s ease;background-color:rgba(0,0,0,.3);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.qqq-floating-buttons-animated button:hover:not(:disabled){transform:scale(1.1);background-color:rgba(0,0,0,.6)}
+.qqq-floating-buttons-animated button:disabled { cursor: not-allowed; opacity: 0.4; }
+.qqq-floating-buttons-animated svg{width:14px;height:14px;stroke-width:2.5;fill:none}
+.qqq-share-btn-animated svg{stroke:#42a5f5}.qqq-download-btn-animated svg{stroke:#ef5350}
+.qqq-image-counter-animated{color:#e0e0e0;font-size:12px;font-weight:700;background-color:rgba(0,0,0,.4);padding:4px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+
+/* --- HQ बटन की स्टाइल --- */
+.qqq-hq-btn-animated { color: #fff; font-family: sans-serif; font-size: 11px; font-weight: bold; }
+.qqq-hq-btn-animated.loading { cursor: wait; color: #888; }
+.qqq-hq-btn-animated.active { background-color: #007bff !important; border-color: #007bff !important; color: #fff; }
+
+/* --- थंबनेल ग्रिड (नया) --- */
+.qqq-thumbnail-section {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.qqq-thumbnail-title {
+    text-align: center;
+    color: #FFD700;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+.qqq-thumbnail-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 10px;
+    justify-content: center;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 5px;
+}
+.qqq-thumbnail-grid-container::-webkit-scrollbar {
+    width: 6px;
+}
+.qqq-thumbnail-grid-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+.qqq-thumbnail-grid-container::-webkit-scrollbar-thumb {
+    background: #D4AF37;
+    border-radius: 3px;
+}
+.qqq-thumbnail-item {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+.qqq-thumbnail-item:hover {
+    transform: scale(1.1);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+.qqq-thumbnail-item.active {
+    border-color: #FFD700;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+/* --- टोस्ट संदेश --- */
+.qqq-toast-animated{visibility:hidden;min-width:250px;background-color:#333;color:#fff;text-align:center;border-radius:8px;padding:16px;position:fixed;z-index:1001;left:50%;bottom:30px;transform:translateX(-50%);font-size:14px;opacity:0;transition:all .5s;box-shadow:0 5px 15px rgba(0,0,0,.3)}
+.qqq-toast-animated.show{visibility:visible;opacity:1}
+
+/* --- अतिरिक्त नेविगेशन बटन --- */
+.qqq-additional-nav-buttons{margin-top:25px;display:flex;justify-content:center;gap:15px;flex-wrap:wrap}
+.qqq-atithi-nav-link-button{display:inline-flex;align-items:center;padding:10px 22px;background:linear-gradient(145deg, #1e293b, #2c3e50);color:#FFD700 !important;border:2px solid #D4AF37;border-radius:10px;text-decoration:none;font-family:'Teko',sans-serif;font-size:1.2em;letter-spacing:1.2px;text-transform:uppercase;transition:all .3s ease;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), 0 2px 3px rgba(0,0,0,0.3);text-shadow:1px 1px 3px rgba(0,0,0,0.6)}
+.qqq-atithi-nav-link-button .fa-solid{margin-right:10px;font-size:1.1em;text-shadow:none}
+.qqq-atithi-nav-link-button:hover{background:radial-gradient(circle, #FFD700 0%, #f0c300 100%);color:#111 !important;border-color:#FFD700;transform:translateY(-3px) scale(1.05);box-shadow:0 5px 15px rgba(255,215,0,0.5)}
+
+@media (max-width:768px){#qqq-image-title-animated{font-size:1.3rem}}
+
+/* ================================================================== */
+/* CSS FOR WIDGET 2: VIDEO PLAYER (PREFIX: ati_) - NO CHANGES MADE */
+/* ================================================================== */
+@keyframes ati_pulseGlow {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35); }
+    50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.55); }
+}
+@keyframes ati_shineAnimation {
+    0% { transform: translateX(-150%) skewX(-30deg); }
+    100% { transform: translateX(150%) skewX(-30deg); }
+}
+@keyframes ati_playerModalOpenAnimation { 
+    from {opacity: 0; transform: scale(0.95);} 
+    to {opacity: 1; transform: scale(1);} 
+}
+.ati_action_container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.ati_action_box { position: relative; width: 100%; max-width: 280px; padding-top: 56.25%; border: 2px solid #FFD700; border-radius: 12px; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); overflow: hidden; animation: ati_pulseGlow 3s infinite ease-in-out; }
+.ati_action_box:hover { transform: translateY(-5px) scale(1.03); animation-play-state: paused; box-shadow: 0 8px 30px rgba(255, 215, 0, 0.7); }
+#ati_video_button_box { background: radial-gradient(circle, #3a3a3a 0%, #1a1a1a 100%); }
+#ati_video_button_box::after { content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0) 100%); animation: ati_shineAnimation 4s infinite linear 1s; z-index: 1; }
+#ati_photo_button_box { background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9AcPwyazt2PFX0viwilAQvx08o-QgnmMWqTHeI-nXBr0zRwbee6xbxqdg2wUrCvXC78MP4XUu2yTqFiWnbvaQ4X5V8fXAZv5-YzzD0LTK_49Da-PHzGWp0CeNsRMU4XAQpwAlIsBM7wWip979TSOjXgG_oJcZ6akMVQX3qM3GdqQkthpVWlLLxAL6-lFk/s850/image_search_1749711565306.jpg'); background-size: cover; background-position: center; }
+.ati_button { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff; font-family: 'Teko', sans-serif; font-size: 1.6em; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; text-shadow: 2px 2px 8px #000; text-decoration: none; padding: 10px; box-sizing: border-box; background: transparent; transition: transform 0.35s ease-out; z-index: 2; }
+.ati_button i, #ati_auto_open_btn::before { font-size: 3.5em; margin-bottom: 10px; line-height: 1; background: linear-gradient(45deg, #FFFACD, #FFD700, #FFB347); -webkit-background-clip: text; background-clip: text; color: transparent; transition: all 0.3s ease; }
+#ati_auto_open_btn::before { font-family: 'Font Awesome 6 Free'; font-weight: 900; content: '\f04b'; }
+.ati_action_box:hover .ati_button i, .ati_action_box:hover #ati_auto_open_btn::before { transform: scale(1.1); }
+.ati_timer_overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 5; flex-direction: column; color: #fff; font-family: 'Teko', sans-serif; backdrop-filter: blur(2px); }
+.ati_timer_overlay img { width: 100px; height: 100px; }
+.ati_timer_overlay p { margin-top: 10px; font-size: 1.1em; letter-spacing: 1px; text-shadow: 1px 1px 3px #000; }
+.ati_additional_nav_buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.ati_nav_link_button { display: inline-flex; align-items: center; padding: 8px 18px; background: #2c3e50; color: #FFD700 !important; border: 2px solid #FFD700; border-radius: 8px; text-decoration: none; font-family: 'Teko', sans-serif; font-size: 1.2em; letter-spacing: 1px; text-transform: uppercase; transition: all 0.25s ease; box-shadow: 0 2px 5px rgba(0,0,0,.4); }
+.ati_nav_link_button i { margin-right: 8px; font-size: 1.1em; }
+.ati_nav_link_button:hover { background: #FFD700; color: #2c3e50 !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); }
+.ati_video_player_modal { display: none; position: fixed; z-index: 10001; left: 0; right: 0; top: 0; bottom: 0; background-color: transparent; backdrop-filter: blur(6px); animation: ati_playerModalOpenAnimation 0.4s ease-out; padding: 0; box-sizing: border-box; }
+.ati_video_player_modal_content { position: relative; width: 100%; height: 100%; background-color: #000; display: flex; flex-direction: column; border-radius: 0; overflow: visible; box-shadow: 0 10px 40px rgba(0,0,0,0.75); border: 5px solid #FFC107; padding: 0; box-sizing: border-box; }
+.ati_video_player_modal_header { max-width: 50%; min-width: 300px; margin: 0 auto 5px; padding: 2px 12px; background-color: rgba(20,5,45,0.9); color: #FFD700; border: 1.5px solid #C71585; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; position: relative; z-index: 10; font-family: sans-serif; }
+.ati_video_player_modal_title { font-size: clamp(1em, 1.5vw, 1.2em); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-right: 10px; }
+.ati_video_player_menu_btn { color: #FFB347; font-size: 1.5em; cursor: pointer; background: none; border: none; padding: 5px 8px; transition: color 0.2s, transform 0.2s; line-height: 1; margin-right: auto; }
+.ati_video_player_modal_close_btn { color: #FFB347; font-size: 1.5em; font-weight: bold; cursor: pointer; background: none; border: none; padding: 0 5px; transition: color 0.2s, transform 0.2s; }
+.ati_video_player_modal_close_btn:hover, .ati_video_player_menu_btn:hover { color: #FF4500; transform: scale(1.1); }
+.ati_video_player_main_area { width: 100%; flex-grow: 1; background-color: #000; position: relative; overflow: hidden; }
+.ati_video_player_main_area iframe, .ati_video_player_main_area video { position: absolute; top: 0; left:0; width: 100%; height: 100%; border: none; display: block; }
+.ati_video_player_main_nav { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(15,3,25,0.6); color: #FFB347; border: 1px solid rgba(255,179,71,0.5); font-size: 1.8em; padding: 8px; cursor: pointer; z-index: 3; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease; }
+.ati_video_player_main_nav:hover { background-color: rgba(255,179,71,0.3); border-color: #FFD700; transform: translateY(-50%) scale(1.08); }
+.ati_video_player_main_prev { left: 15px; }
+.ati_video_player_main_next { right: 15px; }
+.ati_video_dropdown_menu { display: none; position: absolute; top: 100%; left: 0; width: 100%; background-color: rgba(10,2,20,0.98); border: 1px solid #FFB347; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 11; max-height: 300px; overflow-y: auto; }
+.ati_video_dropdown_menu.open { display: block; }
+.ati_video_dropdown_menu::-webkit-scrollbar { width: 5px; }
+.ati_video_dropdown_menu::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+.ati_video_dropdown_menu::-webkit-scrollbar-thumb { background: #FFB347; }
+.ati_video_dropdown_item { padding: 10px 15px; color: #FFDAB9; font-size: 0.95em; cursor: pointer; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color 0.2s; }
+.ati_video_dropdown_item:hover { background-color: rgba(255,179,71,0.25); }
+.ati_video_dropdown_item.ati_active_video_item { background-color: rgba(255,179,71,0.35); font-weight: bold; color: #fff; }
