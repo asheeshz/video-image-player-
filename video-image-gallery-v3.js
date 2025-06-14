@@ -171,3 +171,142 @@
 (function() {
     // ... आपका ati_ विजेट का पूरा जावास्क्रिप्ट कोड यहाँ जैसा था वैसा ही रहेगा ...
 })();
+
+
+/* ===== START: Screen Focus Cosmos Widget JS (v1.4 - Prefix: sfcw-) ===== */
+/* निर्देश: इस JS कोड को ब्लॉगर थीम के मुख्य JS स्थान (आमतौर पर </body> से पहले) में डालें। */
+/* <script> टैग्स का उपयोग न करें। */
+
+(function() {
+    const sfcwCanvas = document.getElementById('sfcw-particle-canvas');
+    if (!sfcwCanvas) return; // अगर विजेट मौजूद नहीं है, तो आगे न बढ़ें
+
+    // --- कॉपीराइट वर्ष अपडेट करें ---
+    const sfcwYearSpan = document.getElementById('sfcw-current-year');
+    if (sfcwYearSpan) {
+        sfcwYearSpan.textContent = " " + new Date().getFullYear();
+    }
+
+    const sfcwCtx = sfcwCanvas.getContext('2d');
+    let sfcwParticles = [];
+    let sfcwAnimationFrameId = null;
+
+    function sfcwResizeCanvas() {
+        sfcwCanvas.width = sfcwCanvas.offsetWidth;
+        sfcwCanvas.height = sfcwCanvas.offsetHeight;
+    }
+
+    class SFCW_Particle {
+        constructor(x, y) {
+            this.x = x || Math.random() * sfcwCanvas.width;
+            this.y = y || Math.random() * sfcwCanvas.height;
+            this.size = Math.random() * 2.5 + 1;
+            this.speedX = (Math.random() * 1 - 0.5) * 0.5;
+            this.speedY = (Math.random() * 1 - 0.5) * 0.5;
+            const rootStyle = getComputedStyle(document.documentElement);
+            const starColor = rootStyle.getPropertyValue('--sfcw-star-color').trim() || 'rgba(240, 248, 255, 0.85)';
+            const particleColor = rootStyle.getPropertyValue('--sfcw-particle-color').trim() || 'rgba(0, 160, 160, 0.5)';
+            this.color = Math.random() > 0.1 ? starColor : particleColor;
+            this.opacity = Math.random() * 0.6 + 0.2;
+            this.initialOpacity = this.opacity;
+            this.life = Math.random() * 2 + 1;
+            this.initialLife = this.life;
+        }
+        update(deltaTime) {
+            this.x += this.speedX * deltaTime * 30;
+            this.y += this.speedY * deltaTime * 30;
+            this.life -= deltaTime;
+            if (this.life <= 0) {
+                this.opacity = 0;
+                if (this.life <= -0.5) { this.reset(); }
+            } else {
+                this.opacity = this.initialOpacity * (0.6 + Math.abs(Math.sin((this.initialLife - this.life) * Math.PI / this.initialLife) * 0.4));
+            }
+            if (this.x <= 0 || this.x >= sfcwCanvas.width) {
+                this.speedX *= -1;
+                this.x = Math.max(1, Math.min(this.x, sfcwCanvas.width - 1));
+            }
+            if (this.y <= 0 || this.y >= sfcwCanvas.height) {
+                this.speedY *= -1;
+                this.y = Math.max(1, Math.min(this.y, sfcwCanvas.height - 1));
+            }
+        }
+        reset() {
+            this.x = Math.random() * sfcwCanvas.width;
+            this.y = Math.random() * sfcwCanvas.height;
+            this.opacity = this.initialOpacity;
+            this.life = this.initialLife;
+            this.speedX = (Math.random() * 1 - 0.5) * 0.5;
+            this.speedY = (Math.random() * 1 - 0.5) * 0.5;
+        }
+        draw() {
+            if (this.opacity <= 0) return;
+            sfcwCtx.globalAlpha = this.opacity;
+            sfcwCtx.fillStyle = this.color;
+            sfcwCtx.beginPath();
+            sfcwCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            sfcwCtx.fill();
+        }
+    }
+
+    function sfcwInitParticles() {
+        sfcwParticles = [];
+        let numberOfParticles = Math.floor(sfcwCanvas.width * sfcwCanvas.height / 15000);
+        numberOfParticles = Math.max(50, Math.min(numberOfParticles, 150));
+        for (let i = 0; i < numberOfParticles; i++) {
+            sfcwParticles.push(new SFCW_Particle());
+        }
+    }
+
+    let sfcwLastTime = 0;
+    function sfcwAnimateParticles(timestamp) {
+        if (document.hidden) {
+            sfcwLastTime = timestamp;
+            sfcwAnimationFrameId = requestAnimationFrame(sfcwAnimateParticles);
+            return;
+        }
+        const deltaTime = (timestamp - sfcwLastTime) / 1000;
+        sfcwLastTime = timestamp;
+        sfcwCtx.clearRect(0, 0, sfcwCanvas.width, sfcwCanvas.height);
+        sfcwParticles.forEach(p => {
+            if (deltaTime > 0 && deltaTime < 0.1) {
+                p.update(deltaTime);
+            } else if (deltaTime >= 0.1) {
+                p.reset();
+            }
+            p.draw();
+        });
+        sfcwCtx.globalAlpha = 1.0;
+        sfcwAnimationFrameId = requestAnimationFrame(sfcwAnimateParticles);
+    }
+
+    function sfcwStartAnimation() {
+        sfcwResizeCanvas();
+        sfcwInitParticles();
+        if (sfcwAnimationFrameId) {
+            cancelAnimationFrame(sfcwAnimationFrameId);
+        }
+        sfcwLastTime = performance.now();
+        sfcwAnimationFrameId = requestAnimationFrame(sfcwAnimateParticles);
+    }
+
+    const sfcwStartDelay = setTimeout(sfcwStartAnimation, 100);
+    let sfcwResizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(sfcwResizeTimeout);
+        sfcwResizeTimeout = setTimeout(() => {
+            if (sfcwAnimationFrameId) {
+                cancelAnimationFrame(sfcwAnimationFrameId);
+            }
+            sfcwStartAnimation();
+        }, 500);
+    });
+    window.addEventListener('beforeunload', () => {
+        if (sfcwAnimationFrameId) {
+            cancelAnimationFrame(sfcwAnimationFrameId);
+        }
+        clearTimeout(sfcwStartDelay);
+        clearTimeout(sfcwResizeTimeout);
+    });
+})();
+/* ===== END: Screen Focus Cosmos Widget JS ===== */
