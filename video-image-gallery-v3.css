@@ -124,3 +124,183 @@
 /* ================================================================== */
 @keyframes ati_pulseGlow {0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35); } 50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.55); }}
 /* ... बाकी का ati_ CSS कोड जैसा था वैसा ही रहेगा ... */
+
+
+
+/* ===== START: Screen Focus Cosmos Widget CSS (v1.4 - Prefix: sfcw-) ===== */
+/* निर्देश: इस CSS को ब्लॉगर थीम के मुख्य CSS (<b:skin> या CSS फ़ाइल) में डालें। */
+/* <style> टैग्स का उपयोग न करें। */
+
+:root {
+    --sfcw-primary-glow: #e0e8ff;
+    --sfcw-secondary-glow: #d0dfff;
+    --sfcw-highlight: #ffffff;
+    --sfcw-link-hover: #f0d0ff;
+    --sfcw-deep-space-1: #0b0f1a;
+    --sfcw-deep-space-2: #1a1d3d;
+    --sfcw-deep-space-3: #221e4a;
+    --sfcw-nebula-accent: #00a0a0;
+    --sfcw-star-color: rgba(240, 248, 255, 0.85);
+    --sfcw-particle-color: rgba(0, 160, 160, 0.5);
+    --sfcw-screen-bg: rgba(11, 15, 26, 0.4);
+    --sfcw-screen-border: rgba(0, 160, 160, 0.3);
+    --sfcw-screen-shadow: rgba(0, 160, 160, 0.15);
+}
+
+.sfcw-widget {
+    font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+    position: relative;
+    width: 100%;
+    padding: 45px 0 35px 0;
+    background: radial-gradient(ellipse at bottom, var(--sfcw-deep-space-2) 0%, var(--sfcw-deep-space-1) 100%),
+                linear-gradient(315deg, var(--sfcw-deep-space-1) 0%, var(--sfcw-deep-space-3) 74%);
+    background-blend-mode: screen;
+    overflow: hidden;
+    border-top: 5px ridge rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.4);
+}
+
+.sfcw-background-depth {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 5%, transparent 40%),
+                radial-gradient(circle, rgba(0, 160, 160, 0.05) 10%, transparent 50%);
+    background-size: 150px 150px, 250px 250px; background-position: 0 0, 50px 50px;
+    opacity: 0.5; animation: sfcw-slow-pan 60s linear infinite; z-index: 0;
+}
+@keyframes sfcw-slow-pan { 100% { background-position: 150px 150px, 200px 200px; } }
+
+#sfcw-particle-canvas { /* ID सेलेक्टर अपडेट किया */
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1; pointer-events: none;
+}
+
+.sfcw-container {
+    max-width: 1000px; margin: 0 auto; padding: 0 20px;
+    position: relative; z-index: 2; text-align: center;
+    color: var(--sfcw-secondary-glow);
+}
+
+.sfcw-content-screen { /* प्रीफिक्स्ड क्लास */
+    background: var(--sfcw-screen-bg);
+    border: 1px solid var(--sfcw-screen-border);
+    border-radius: 15px;
+    padding: 25px 20px 20px 20px;
+    margin: 0 auto 25px auto;
+    max-width: 600px;
+    box-shadow: 0 0 20px var(--sfcw-screen-shadow), inset 0 0 10px rgba(0,0,0,0.3);
+    position: relative;
+    opacity: 0;
+    filter: blur(3px);
+    animation: sfcw-reveal-glow 1.5s cubic-bezier(0.23, 1, 0.32, 1) 0.5s forwards; /* प्रीफिक्स्ड एनिमेशन नाम */
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.sfcw-credits, .sfcw-organization { /* प्रीफिक्स्ड क्लास */
+    animation: none; opacity: 1; filter: none;
+    margin-bottom: 12px; line-height: 1.8;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px var(--sfcw-nebula-accent);
+}
+.sfcw-organization { margin-bottom: 0; }
+
+@keyframes sfcw-reveal-glow { /* प्रीफिक्स्ड एनिमेशन नाम */
+    from { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(3px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.sfcw-credits p, .sfcw-organization p { margin: 6px 0; font-size: 1.1em; }
+
+.sfcw-energized-text { /* प्रीफिक्स्ड क्लास */
+    font-weight: 700; font-family: 'Orbitron', sans-serif; font-size: 1.6em;
+    background-image: linear-gradient( 110deg, var(--sfcw-highlight) 0%, var(--sfcw-secondary-glow) 20%, var(--sfcw-link-hover) 40%, var(--sfcw-nebula-accent) 60%, var(--sfcw-secondary-glow) 80%, var(--sfcw-highlight) 100% );
+    background-size: 300% 100%; color: transparent; background-clip: text; -webkit-background-clip: text;
+    animation: sfcw-energize-flow 5s linear infinite; /* प्रीफिक्स्ड एनिमेशन नाम */
+    display: inline-block; transition: text-shadow 0.3s ease; cursor: default;
+}
+.sfcw-energized-text:hover { text-shadow: 0 0 15px var(--sfcw-highlight); }
+
+@keyframes sfcw-energize-flow { /* प्रीफिक्स्ड एनिमेशन नाम */
+    0% { background-position: 150% 50%; } 100% { background-position: -150% 50%; }
+}
+
+.sfcw-credits .sfcw-author-title { /* प्रीफिक्स्ड क्लास */
+     font-size: 0.95em; font-style: normal;
+     color: var(--sfcw-primary-glow); opacity: 0.9;
+     margin-top: 2px; display: block;
+     letter-spacing: 1px; word-spacing: 3px;
+ }
+ .sfcw-author-title span.sfcw-separator-icon { /* प्रीफिक्स्ड क्लास */
+      opacity: 0.5; margin: 0 5px; font-size: 0.8em; vertical-align: middle;
+ }
+
+.sfcw-organization strong { font-weight: 700; color: var(--sfcw-highlight); }
+.sfcw-organization a { color: inherit; text-decoration: none;} /* संगठन लिंक स्टाइल */
+.sfcw-organization a:hover { text-decoration: underline; }
+
+
+.sfcw-links, .sfcw-copyright { /* प्रीफिक्स्ड क्लास */
+    opacity: 0; filter: blur(3px);
+    animation: sfcw-reveal-glow 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; /* प्रीफिक्स्ड एनिमेशन नाम */
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px var(--sfcw-nebula-accent);
+    margin-bottom: 22px; line-height: 1.8;
+}
+.sfcw-links { animation-delay: 0.9s; }
+.sfcw-copyright { animation-delay: 1.1s; margin-bottom: 0; }
+
+.sfcw-links nav { /* प्रीफिक्स्ड क्लास */
+    margin-top: 15px; padding: 18px 0; background: rgba(11, 15, 26, 0.3);
+    border: 1px solid rgba(0, 160, 160, 0.2); border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 160, 160, 0.1);
+}
+.sfcw-links span.sfcw-link-label { /* प्रीफिक्स्ड क्लास */
+    font-weight: 500; color: var(--sfcw-primary-glow); margin-right: 10px;
+    font-size: 1em; display: inline-block; margin-bottom: 8px;
+}
+.sfcw-links a { /* प्रीफिक्स्ड क्लास */
+    color: var(--sfcw-secondary-glow); text-decoration: none; margin: 0 14px; font-size: 1.05em;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; position: relative; padding-bottom: 3px;
+}
+.sfcw-links a::after { /* प्रीफिक्स्ड क्लास */
+    content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 50%;
+    background: linear-gradient(90deg, var(--sfcw-link-hover), var(--sfcw-nebula-accent));
+    transition: all 0.4s ease-out; transform: translateX(-50%);
+}
+.sfcw-links a:hover { /* प्रीफिक्स्ड क्लास */
+    color: var(--sfcw-highlight); transform: translateY(-4px) scale(1.15);
+    text-shadow: 0 0 12px var(--sfcw-link-hover);
+}
+.sfcw-links a:hover::after { width: 100%; } /* प्रीफिक्स्ड क्लास */
+
+.sfcw-links i.fas, .sfcw-links i.fab { margin-right: 6px; transition: transform 0.3s ease; vertical-align: middle; } /* प्रीफिक्स्ड क्लास */
+.sfcw-links a:hover i { transform: rotate(-15deg) scale(1.1); } /* प्रीफिक्स्ड क्लास */
+
+.sfcw-links .sfcw-separator { /* प्रीफिक्स्ड क्लास */
+    color: rgba(0, 160, 160, 0.4); margin: 0 8px; font-size: 1em; opacity: 0.7;
+}
+
+.sfcw-copyright { /* प्रीफिक्स्ड क्लास */
+    font-size: 0.9em; color: var(--sfcw-primary-glow); opacity: 0.75;
+    margin-top: 25px; padding-top: 18px; border-top: 1px solid rgba(0, 160, 160, 0.2);
+}
+.sfcw-copyright i.fa-copyright { margin-right: 5px; vertical-align: middle; } /* प्रीफिक्स्ड क्लास */
+
+/* Responsiveness */
+@media (max-width: 768px) {
+     .sfcw-content-screen { max-width: 90%; padding: 20px 15px 15px 15px;}
+     .sfcw-widget { padding: 35px 0 25px 0; }
+     .sfcw-credits p, .sfcw-organization p { font-size: 1.05em; }
+     .sfcw-energized-text { font-size: 1.4em; }
+     .sfcw-links a { margin: 6px 10px; font-size: 1em; }
+}
+@media (max-width: 480px) {
+    .sfcw-content-screen { max-width: 95%; padding: 15px 10px 10px 10px;}
+     .sfcw-credits p, .sfcw-organization p { font-size: 1em; }
+     .sfcw-energized-text { font-size: 1.2em; }
+     .sfcw-author-title { letter-spacing: 0.5px; word-spacing: 2px; }
+     .sfcw-links nav { padding: 15px 5px; }
+     .sfcw-links a { margin: 8px 8px; font-size: 0.95em; }
+     .sfcw-links span.sfcw-link-label { display: block; margin-bottom: 8px; }
+     .sfcw-separator { display: none; }
+}
+/* ===== END: Screen Focus Cosmos Widget CSS ===== */
